@@ -50,7 +50,7 @@ export async function getHostLists(password: string) {
   return { lists: results }
 }
 
-export async function deleteAttendanceParticipant(password: string, listId: string, participantId: number) {
+export async function deleteAttendanceParticipant(password: string, listId: string, participantId: string) {
   if (password !== creatorPassword) return { error: 'Kata sandi host tidak sesuai.' }
   const parsedListId = listIdSchema.safeParse(listId)
   if (!parsedListId.success) return { error: 'ID daftar tidak valid.' }
