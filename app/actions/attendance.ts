@@ -1,0 +1,109 @@
+'use server'
+
+import { headers } from 'next/headers'
+import { revalidatePath } from 'next/cache'
+import { and, asc, eq } from 'drizzle-orm'
+import { z } from 'zod'
+import { db } from '@/lib/db'
+import { attendanceLists, attendanceParticipants } from '@/lib/db/schema'
+
+const creatorPassword = '1n54n1'
+const listNameSchema = z.string().trim().min(1).max(8)
+const listPasswordSchema = z.string().regex(/^\d{4}$/, 'Kata sandi daftar harus terdiri dari 4 digit angka.')
+const listIdSchema = z.string().trim().toUpperCase().regex(/^[A-Z0-9]{4}$/)
+const fullNameSchema = z.string().trim().min(2).max(32)
+const attendanceWindowMs = 2.5 * 60 * 60 * 1000
+
+function makeListId() {
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+  return Array.from({ length: 4 }, () => alphabet[Math.floor(Math.random() * alphabet.length)]).join('')
+}
+
+export async function createAttendanceList(listName: string, listPassword: string, hostPassword: string) {
+  if (hostPassword !== creatorPassword) return { error: 'Kata sandi host tidak sesuai.' }
+  const parsedName = listNameSchema.safeParse(listName)
+  const parsedPassword = listPasswordSchema.safeParse(listPassword)
+  if (!parsedName.success) return { error: 'Nama daftar wajib diisi dan maksimal 8 karakter.' }
+  if (!parsedPassword.success) return { error: 'Gunakan kata sandi daftar antara 4 dan 64 karakter.' }
+
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const id = makeListId()
+    const existing = await db.select({ id: attendanceLists.id }).from(attendanceLists).where(eq(attendanceLists.id, id)).limit(1)
+    if (existing.length === 0) {
+      const createdAt = new Date()
+      const expiresAt = new Date(createdAt.getTime() + attendanceWindowMs)
+      await db.insert(attendanceLists).values({ id, listName: parsedName.data, creatorPassword, listPassword: parsedPassword.data, createdAt, expiresAt })
+      return { id, expiresAt }
+    }
+  }
+
+  return { error: 'Could not create a unique list. Please try again.' }
+}
+
+export async function getHostLists(password: string) {
+  if (password !== creatorPassword) return { error: 'Kata sandi host tidak sesuai.' }
+  const lists = await db.select().from(attendanceLists).orderBy(asc(attendanceLists.createdAt))
+  const results = await Promise.all(lists.map(async (list) => ({
+    ...list,
+    participants: await db.select().from(attendanceParticipants).where(eq(attendanceParticipants.listId, list.id)).orderBy(asc(attendanceParticipants.createdAt)),
+  })))
+  return { lists: results }
+}
+
+export async function deleteAttendanceParticipant(password: string, listId: string, participantId: number) {
+  if (password !== creatorPassword) return { error: 'Kata sandi host tidak sesuai.' }
+  const parsedListId = listIdSchema.safeParse(listId)
+  if (!parsedListId.success) return { error: 'ID daftar tidak valid.' }
+  await db.delete(attendanceParticipants).where(and(eq(attendanceParticipants.id, participantId), eq(attendanceParticipants.listId, parsedListId.data)))
+  revalidatePath('/')
+  return { success: true }
+}
+
+export async function deleteAttendanceLists(password: string, listIds: string[]) {
+  if (password !== creatorPassword) return { error: 'Kata sandi host tidak sesuai.' }
+  const ids = listIds.map((id) => listIdSchema.safeParse(id)).filter((result): result is { success: true; data: string } => result.success).map((result) => result.data)
+  if (ids.length === 0) return { error: 'Pilih minimal satu daftar.' }
+  for (const id of ids) {
+    await db.delete(attendanceParticipants).where(eq(attendanceParticipants.listId, id))
+    await db.delete(attendanceLists).where(eq(attendanceLists.id, id))
+  }
+  revalidatePath('/')
+  return { success: true }
+}
+
+export async function getAttendanceList(listId: string, password: string, mode: 'participant' | 'host') {
+  const parsedId = listIdSchema.safeParse(listId)
+  if (!parsedId.success) return { error: 'List ID must be 4 characters.' }
+  const list = await db.select().from(attendanceLists).where(eq(attendanceLists.id, parsedId.data)).limit(1)
+  if (!list[0]) return { error: 'Tidak ada ID tersebut di daftar hadir' }
+  const validPassword = mode === 'host' ? password === creatorPassword : password === list[0].listPassword
+  if (!validPassword) return { error: 'That password is not correct.' }
+  const participants = await db.select().from(attendanceParticipants).where(eq(attendanceParticipants.listId, parsedId.data)).orderBy(asc(attendanceParticipants.createdAt))
+  const requestHeaders = await headers()
+  const ipAddress = requestHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() || requestHeaders.get('x-real-ip') || 'unknown'
+  const existingIp = await db.select({ id: attendanceParticipants.id }).from(attendanceParticipants).where(and(eq(attendanceParticipants.listId, parsedId.data), eq(attendanceParticipants.ipAddress, ipAddress))).limit(1)
+  return { listId: list[0].id, listName: list[0].listName, expiresAt: list[0].expiresAt, participants, duplicateIp: existingIp.length > 0 }
+}
+
+export async function addParticipant(listId: string, password: string, fullName: string) {
+  const parsedId = listIdSchema.safeParse(listId)
+  const parsedName = fullNameSchema.safeParse(fullName)
+  if (!parsedId.success) return { error: 'List ID must be 4 characters.' }
+  if (!parsedName.success) return { error: 'Enter your full name.' }
+  const list = await db.select({ id: attendanceLists.id, expiresAt: attendanceLists.expiresAt }).from(attendanceLists).where(and(eq(attendanceLists.id, parsedId.data), eq(attendanceLists.listPassword, password))).limit(1)
+  if (!list[0]) return { error: 'List ID atau kata sandi tidak sesuai.' }
+  if (list[0].expiresAt.getTime() <= Date.now()) return { error: 'Daftar hadir ini telah ditutup.' }
+  const existingParticipant = await db.select({ id: attendanceParticipants.id }).from(attendanceParticipants).where(and(eq(attendanceParticipants.listId, parsedId.data), eq(attendanceParticipants.fullName, parsedName.data))).limit(1)
+  if (existingParticipant.length > 0) return { error: 'nama anda sudah ada di dalam daftar hadir' }
+  const requestHeaders = await headers()
+  const ipAddress = requestHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() || requestHeaders.get('x-real-ip') || 'unknown'
+  const existingIp = await db.select({ id: attendanceParticipants.id }).from(attendanceParticipants).where(and(eq(attendanceParticipants.listId, parsedId.data), eq(attendanceParticipants.ipAddress, ipAddress))).limit(1)
+  if (existingIp.length > 0) return { error: 'Perangkat ini sudah mengisi daftar hadir.' }
+  try {
+    await db.insert(attendanceParticipants).values({ listId: parsedId.data, fullName: parsedName.data, ipAddress })
+  } catch {
+    return { error: 'Perangkat ini sudah mengisi daftar hadir.' }
+  }
+  revalidatePath('/')
+  return { success: true }
+}
