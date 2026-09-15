@@ -7,13 +7,8 @@ export const metadata: Metadata = {
   description: 'Buat daftar kehadiran pribadi dan biarkan peserta mencatat kehadiran dengan ID empat karakter.',
   generator: 'v0.app',
   icons: {
-    icon: [
-      {
-        url: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-NNCYMFaFanN3dfe9VYG3WkxPzRezVL-MAn7LFyTIYrcjHjFTPLEbGxQkMFls3.png',
-        type: 'image/png',
-      },
-    ],
-    apple: '/apple-icon.png',
+    icon: '/icon.svg',
+    apple: '/icon.svg',
   },
 }
 
