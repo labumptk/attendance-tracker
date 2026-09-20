@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { FormEvent, useEffect, useState } from "react";
 import {
   ArrowLeft,
@@ -57,7 +58,9 @@ export default function Page() {
     [expiresAt, setExpiresAt] = useState("");
   const [message, setMessage] = useState(""),
     [loading, setLoading] = useState(false),
-    [copied, setCopied] = useState(false);
+    [copied, setCopied] = useState(false),
+    [unknownList, setUnknownList] = useState(false),
+    [wrongPassword, setWrongPassword] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search),
@@ -125,9 +128,14 @@ export default function Page() {
     e.preventDefault();
     setLoading(true);
     setMessage("");
+    setUnknownList(false);
+    setWrongPassword(false);
     const result = await getAttendanceList(listId, password, "participant");
     setLoading(false);
-    if ("error" in result) setMessage(result.error);
+    if ("error" in result) {
+      setUnknownList(result.error === "That ID was not found in the attendance list.");
+      setMessage(result.error);
+    }
     else {
       setExpiresAt(result.expiresAt.toISOString());
       setParticipantListName(result.listName);
@@ -167,7 +175,10 @@ export default function Page() {
     setMessage("");
     const result = await addParticipant(listId, password, name);
     setLoading(false);
-    if ("error" in result) setMessage(result.error);
+    if ("error" in result) {
+      setWrongPassword(result.error === "That password is not correct.");
+      setMessage(result.error);
+    }
     else {
       setName("");
       setMessage("Your attendance has been recorded.");
@@ -297,7 +308,7 @@ export default function Page() {
             <div className="w-full max-w-4xl">
               <div className="mb-12 max-w-2xl">
                 <h1 className="text-5xl font-bold leading-[1.05] tracking-tight sm:text-7xl">
-                  Attendance List
+                  Hadir
                 </h1>
                 <p className="mt-3 text-sm text-gray-500">
                   oleh Rachmat Wahid Saleh Insani
@@ -370,9 +381,19 @@ export default function Page() {
                 <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-gray-700">
                   New attendance list
                 </p>
-                <h2 className="text-4xl font-bold tracking-tight">
-                  Create a list
-                </h2>
+  <div className="flex items-center gap-3">
+  <h2 className="text-4xl font-bold tracking-tight">
+  Create a list
+  </h2>
+  <Image
+  src="/pen.png"
+  alt="Blue pen"
+  width={44}
+  height={44}
+  className="size-11 rounded-lg object-cover"
+  priority
+  />
+  </div>
               </div>
               {created ? (
                 <div className="space-y-4">
@@ -434,18 +455,6 @@ export default function Page() {
                         setListName(e.target.value.toUpperCase().slice(0, 8))
                       }
                       maxLength={8}
-                      placeholder="Rapat"
-                      required
-                    />
-                  </label>
-                  <label className="block text-sm font-semibold">
-                    Host password
-                    <input
-                      className={field}
-                      type="password"
-                      value={masterPassword}
-                      onChange={(e) => setMasterPassword(e.target.value)}
-                      placeholder="Enter the host password"
                       required
                     />
                   </label>
@@ -460,8 +469,18 @@ export default function Page() {
                       required
                     />
                   </label>
+                  <label className="block text-sm font-semibold">
+                    Host password
+                    <input
+                      className={field}
+                      type="password"
+                      value={masterPassword}
+                      onChange={(e) => setMasterPassword(e.target.value)}
+                      required
+                    />
+                  </label>
                   <button className={`${primary} w-full`} disabled={loading}>
-                    {loading ? "Creating…" : "Create a list"} <Plus size={17} />
+                    {loading ? "Creating…" : "Create"} <Plus size={17} />
                   </button>
                 </form>
               )}
@@ -482,7 +501,7 @@ export default function Page() {
                   Manage all lists
                 </h2>
                 <p className="mt-3 text-gray-500">
-                  Enter the host password to view and delete lists.
+                  Only a host can manage the lists
                 </p>
               </div>
               <form onSubmit={handleHost} className="space-y-5">
@@ -509,8 +528,62 @@ export default function Page() {
           )}
           {mode === "join" && (
             <div
-              className={`w-full max-w-md ${duplicateIp ? "[&>*:nth-child(n+3)]:hidden" : ""}`}
+              className={`w-full max-w-md ${unknownList ? "" : duplicateIp ? "[&>*:nth-child(n+3)]:hidden" : ""}`}
             >
+              {unknownList ? (
+                <div className="flex flex-col items-center text-center">
+                  <Image
+                    src="/empty.png"
+                    alt="Question mark and magnifying glass illustration"
+                    width={220}
+                    height={220}
+                    className="mb-6 size-44 rounded-2xl object-cover sm:size-52"
+                    priority
+                  />
+                  <p className="max-w-sm text-lg font-semibold leading-7 text-gray-900">
+                    There is no such ID in our database.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUnknownList(false);
+                      setMessage("");
+                      setListId("");
+                      setPassword("");
+                    }}
+                    className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-gray-700 underline underline-offset-4 transition hover:text-black"
+                  >
+                    <ArrowLeft size={16} aria-hidden="true" />
+                    Try again?
+                  </button>
+                </div>
+              ) : wrongPassword ? (
+                <div className="flex flex-col items-center text-center">
+                  <Image
+                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/wrong-SlvRL33Op4A9rczzJ5LWZ6uiyuqWdz.png"
+                    alt="Red incorrect mark illustration"
+                    width={192}
+                    height={192}
+                    className="mb-6 size-48 rounded-2xl object-cover"
+                    priority
+                  />
+                  <p className="text-lg font-semibold leading-7 text-gray-900">
+                    Sorry. That password is incorrect.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setWrongPassword(false);
+                      setMessage("");
+                      setPassword("");
+                    }}
+                    className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-gray-700 underline underline-offset-4 transition hover:text-black"
+                  >
+                    Try again?
+                  </button>
+                </div>
+              ) : (
+              <>
               {duplicateIp && (
                 <>
                   <img
@@ -522,26 +595,36 @@ export default function Page() {
                     className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800"
                     role="alert"
                   >
-You already checked in to Attendance List {participantListName}{" "}
+You already checked in to Hadir {participantListName}{" "}
 earlier. Did you forget?
                   </div>
                 </>
               )}
-              <div className="mb-8">
-                <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-gray-700">
-                  Participant access
-                </p>
-                <h2 className="text-4xl font-bold tracking-tight">
-                  {participantReady || directJoin
-                    ? participantListName || "Record attendance"
-                    : "Record attendance"}
-                </h2>
-                {!(participantReady || directJoin) && (
-                  <p className="mt-3 text-gray-500">
-                    Enter the information shared by the host.
-                  </p>
-                )}
-              </div>
+  <div className="mb-8">
+  <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-gray-700">
+  Participant access
+  </p>
+  <div className="flex items-center gap-3">
+  <h2 className="text-4xl font-bold tracking-tight">
+  {participantReady || directJoin
+  ? participantListName || "Record Attendance"
+  : "Record Attendance"}
+  </h2>
+  <Image
+  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-dMn7yPabzUeKY3v5i1lErYxsfj2i34-eshualed8coqZh0eEbJjYlMFtgMT8v.png"
+  alt="Attendance list illustration with a pencil"
+  width={44}
+  height={44}
+  className="size-11 rounded-lg object-cover"
+  priority
+  />
+  </div>
+  {!(participantReady || directJoin) && (
+  <p className="mt-3 text-gray-500">
+  Enter the information shared by the host.
+  </p>
+  )}
+  </div>
               {error &&
                 !duplicateName &&
                 ((mode === "join" && participantReady) ||
@@ -696,6 +779,8 @@ earlier. Did you forget?
                 >
                   Exit
                 </button>
+              )}
+              </>
               )}
             </div>
           )}
