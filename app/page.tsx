@@ -480,7 +480,7 @@ export default function Page() {
                   Manage all lists
                 </h2>
                 <p className="mt-3 text-gray-500">
-                  Enter the host password to view and delete lists.
+                  Only a host can manage the lists
                 </p>
               </div>
               <form onSubmit={handleHost} className="space-y-5">
