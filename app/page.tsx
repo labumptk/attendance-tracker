@@ -722,7 +722,7 @@ earlier. Did you forget?
                           className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold ${Date.now() >= new Date(selectedList.expiresAt).getTime() ? "border-gray-200 bg-gray-100 text-gray-700" : "border-green-200 bg-green-50 text-green-800"}`}
                           role="status"
                         >
-                          {Date.now() >= new Date(selectedList.expiresAt).getTime() ? "DITUTUP" : "AKTIF"}
+                          {Date.now() >= new Date(selectedList.expiresAt).getTime() ? "INACTIVE" : "ACTIVE"}
                         </div>
                     </div>
                     <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -779,7 +779,7 @@ earlier. Did you forget?
                             <div className="flex items-center justify-between gap-3">
                               <span className="truncate text-base font-bold">{list.listName}</span>
                               <span className={`flex shrink-0 items-center gap-1.5 text-xs font-semibold ${Date.now() >= new Date(list.expiresAt).getTime() ? "text-red-700" : "text-green-700"}`}>
-                                {Date.now() >= new Date(list.expiresAt).getTime() ? "CLOSED" : "ACTIVE"}
+                                {Date.now() >= new Date(list.expiresAt).getTime() ? "INACTIVE" : "ACTIVE"}
                                 <span aria-hidden="true" className={`size-2 rounded-full ${Date.now() >= new Date(list.expiresAt).getTime() ? "bg-red-500" : "bg-green-500"}`} />
                               </span>
                             </div>
