@@ -1,6 +1,6 @@
 'use server'
 
-import { headers } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { and, asc, desc, eq } from 'drizzle-orm'
 import { z } from 'zod'
@@ -42,12 +42,10 @@ export async function createAttendanceList(listName: string, listPassword: strin
 
 export async function getHostLists(password: string) {
   if (password !== creatorPassword) return { error: 'Kata sandi host tidak sesuai.' }
+  const cookieStore = await cookies()
+  cookieStore.set('host-access', 'granted', { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 60 * 60 * 8, path: '/' })
   const lists = await db.select().from(attendanceLists).orderBy(desc(attendanceLists.createdAt))
-  const results = await Promise.all(lists.map(async (list) => ({
-    ...list,
-    participants: await db.select().from(attendanceParticipants).where(eq(attendanceParticipants.listId, list.id)).orderBy(asc(attendanceParticipants.createdAt)),
-  })))
-  return { lists: results }
+  return { lists: lists.map((list) => ({ ...list, participants: [] })) }
 }
 
 export async function deleteAttendanceParticipant(password: string, listId: string, participantId: string) {
