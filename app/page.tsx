@@ -134,6 +134,7 @@ export default function Page() {
     setLoading(false);
     if ("error" in result) {
       setUnknownList(result.error === "That ID was not found in the attendance list.");
+      setWrongPassword(result.error === "That password is not correct.");
       setMessage(result.error);
     }
     else {
