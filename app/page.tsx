@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import {
   ArrowLeft,
@@ -16,6 +15,7 @@ import {
   addParticipant,
   createAttendanceList,
   deleteAttendanceLists,
+  deleteAttendanceParticipant,
   getAttendanceList,
   getHostLists,
 } from "./actions/attendance";
@@ -44,6 +44,7 @@ export default function Page() {
   );
   const [hostLists, setHostLists] = useState<HostList[]>([]),
     [selected, setSelected] = useState<string[]>([]),
+    [selectedList, setSelectedList] = useState<HostList | null>(null),
     [listOrder, setListOrder] = useState<"newest" | "oldest">("newest"),
     [participantSort, setParticipantSort] = useState<
       Record<string, "az" | "za" | "newest" | "oldest" | "name" | "time">
@@ -85,6 +86,7 @@ export default function Page() {
     setCreated(null);
     setHostLists([]);
     setSelected([]);
+    setSelectedList(null);
     setParticipants([]);
     setParticipantReady(false);
     setDuplicateIp(false);
@@ -146,6 +148,18 @@ export default function Page() {
       setListOrder("newest");
       setMode("host");
     }
+  }
+  async function openListDetails(list: HostList) {
+    setLoading(true);
+    setMessage("");
+    const result = await getAttendanceList(list.id, password, "host");
+    setLoading(false);
+    if ("error" in result) {
+      setMessage(result.error);
+      return;
+    }
+    setSelectedList({ ...list, participants: result.participants });
+    setParticipantSort((current) => ({ ...current, [list.id]: "oldest" }));
   }
   async function handleAttendance(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -212,7 +226,7 @@ export default function Page() {
       ...list.participants.map((p) => [
         p.fullName,
         p.ipAddress,
-        p.createdAt ? new Date(p.createdAt).toISOString() : "",
+        p.createdAt ? formatDateTime(p.createdAt) : "",
       ]),
     ];
     const blob = new Blob(
@@ -239,11 +253,16 @@ export default function Page() {
     expiresAt && Date.now() >= new Date(expiresAt).getTime(),
   );
   const duplicateName = message.toLowerCase().includes("sudah ada");
-  const formatDateTime = (value: Date | string) => {
-    const date = new Date(value);
-    const pad = (part: number) => String(part).padStart(2, "0");
-    return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
-  };
+  const formatDateTime = (value: Date | string) =>
+    new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Asia/Jakarta",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23",
+    }).format(new Date(value));
   const formattedCloseTime = expiresAt
     ? formatDateTime(expiresAt)
     : "2,5 jam setelah daftar dibuat";
@@ -676,30 +695,6 @@ export default function Page() {
                   >
                     <Trash2 size={16} /> Hapus terpilih
                   </button>
-                  <label className="inline-flex h-10 items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-700">
-                    Urutkan
-                    <select
-                      aria-label="Urutkan daftar"
-                      value={listOrder}
-                      onChange={(e) => {
-                        const order = e.target.value as "newest" | "oldest";
-                        setListOrder(order);
-                        setHostLists((lists) =>
-                          [...lists].sort((a, b) =>
-                            order === "newest"
-                              ? new Date(b.createdAt).getTime() -
-                                new Date(a.createdAt).getTime()
-                              : new Date(a.createdAt).getTime() -
-                                new Date(b.createdAt).getTime(),
-                          ),
-                        );
-                      }}
-                      className="bg-transparent outline-none"
-                    >
-                      <option value="newest">Terbaru</option>
-                      <option value="oldest">Terlama</option>
-                    </select>
-                  </label>
                 </div>
               </div>
               {message && (
@@ -711,58 +706,94 @@ export default function Page() {
                 <div className="rounded-2xl border border-gray-200 bg-white px-5 py-16 text-center text-sm text-gray-500">
                   Belum ada daftar kehadiran.
                 </div>
-              ) : (
-                <div className="grid gap-4 md:grid-cols-2">
-                  {hostLists.map((list) => (
-                    <Link
-                      href={`/list/${list.id}`}
-                      key={list.id}
-                      aria-label={`Buka detail daftar ${list.listName}`}
-                      className="block rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm transition hover:-translate-y-0.5 hover:border-gray-400 hover:shadow-md"
-                    >
-                      <div className="flex items-center gap-3">
-                        <input
-                          type="checkbox"
-                          checked={selected.includes(list.id)}
-                          aria-label={`Pilih daftar ${list.listName}`}
-                          onClick={(e) => e.stopPropagation()}
-                          onChange={(e) =>
-                            setSelected((current) =>
-                              e.target.checked
-                                ? [...current, list.id]
-                                : current.filter((id) => id !== list.id),
-                            )
-                          }
-                          className="size-4 shrink-0 accent-black"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center justify-between gap-3">
-                            <span className="truncate text-base font-bold">
-                              {list.listName}
-                            </span>
-                            <span
-                              className={`flex shrink-0 items-center gap-1.5 text-xs font-semibold ${Date.now() >= new Date(list.expiresAt).getTime() ? "text-red-700" : "text-green-700"}`}
-                            >
-                              {Date.now() >= new Date(list.expiresAt).getTime() ? "Ditutup" : "Dibuka"}
-                              <span
-                                aria-hidden="true"
-                                className={`size-2 rounded-full ${Date.now() >= new Date(list.expiresAt).getTime() ? "bg-red-500" : "bg-green-500"}`}
-                              />
-                            </span>
-                          </div>
-                          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
-                            <span className="font-mono">{list.id}</span>
-                            <span>{formatDateTime(list.createdAt)}</span>
-                            <span className="inline-flex items-center gap-1 font-semibold">
-                              <Users size={13} /> {list.participantCount} peserta
-                            </span>
-                          </div>
+              ) : selectedList ? (
+                  <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+                    <div className="mb-5 flex items-start justify-between gap-4">
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-[0.18em] text-gray-500">Detail daftar</p>
+                        <h3 className="mt-2 text-2xl font-bold">{selectedList.listName}</h3>
+                        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm text-gray-500">
+                          <span>Kode: <strong className="font-mono text-gray-900">{selectedList.id}</strong></span>
+                          <span>Dibuat: {formatDateTime(selectedList.createdAt)}</span>
+                          <span>{selectedList.participants.length} peserta</span>
                         </div>
                       </div>
-                    </Link>
-                  ))}
-                </div>
-              )}
+<div
+                          className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold ${Date.now() >= new Date(selectedList.expiresAt).getTime() ? "border-gray-200 bg-gray-100 text-gray-700" : "border-green-200 bg-green-50 text-green-800"}`}
+                          role="status"
+                        >
+                          {Date.now() >= new Date(selectedList.expiresAt).getTime() ? "DITUTUP" : "AKTIF"}
+                        </div>
+                    </div>
+                    <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                      <h4 className="font-semibold">Peserta</h4>
+                      <label className="inline-flex h-9 items-center gap-2 rounded-lg border border-gray-200 px-3 text-sm font-medium">
+                        <select
+                          aria-label="Urutkan peserta"
+                          value={participantSort[selectedList.id] ?? "oldest"}
+                          onChange={(e) => setParticipantSort((current) => ({ ...current, [selectedList.id]: e.target.value as "az" | "za" | "newest" | "oldest" }))}
+                          className="bg-transparent outline-none"
+                        >
+                          <option value="az">A ke Z</option>
+                          <option value="za">Z ke A</option>
+                          <option value="newest">Terbaru</option>
+                          <option value="oldest">Terlama</option>
+                        </select>
+                      </label>
+                    </div>
+                    <div className="divide-y divide-gray-100 rounded-xl border border-gray-100">
+                      {[...selectedList.participants].sort((a, b) => {
+                        const order = participantSort[selectedList.id] ?? "oldest";
+                        if (order === "az" || order === "za") return order === "az" ? a.fullName.localeCompare(b.fullName) : b.fullName.localeCompare(a.fullName);
+                        return order === "newest" ? new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime() : new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+                      }).map((participant) => (
+                        <div key={participant.id} className="flex items-center justify-between gap-4 px-4 py-3 text-sm">
+                          <span className="font-medium">{participant.fullName}</span>
+                          <span className="text-xs text-gray-500">{formatDateTime(participant.createdAt)}</span>
+                        </div>
+                      ))}
+                      {selectedList.participants.length === 0 && <p className="px-4 py-6 text-center text-sm text-gray-500">Belum ada peserta.</p>}
+                    </div>
+                    <button onClick={() => setSelectedList(null)} className="mt-5 text-sm font-semibold text-gray-500 hover:text-black">← Kembali ke semua daftar</button>
+                  </div>
+                ) : (
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {hostLists.map((list) => (
+                      <button
+                        type="button"
+                        onClick={() => openListDetails(list)}
+                        key={list.id}
+                        aria-label={`Buka detail daftar ${list.listName}`}
+                        className="block w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-gray-400 hover:shadow-md"
+                      >
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            checked={selected.includes(list.id)}
+                            aria-label={`Pilih daftar ${list.listName}`}
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={(e) => setSelected((current) => e.target.checked ? [...current, list.id] : current.filter((id) => id !== list.id))}
+                            className="size-4 shrink-0 accent-black"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="truncate text-base font-bold">{list.listName}</span>
+                              <span className={`flex shrink-0 items-center gap-1.5 text-xs font-semibold ${Date.now() >= new Date(list.expiresAt).getTime() ? "text-red-700" : "text-green-700"}`}>
+                                {Date.now() >= new Date(list.expiresAt).getTime() ? "Ditutup" : "AKTIF"}
+                                <span aria-hidden="true" className={`size-2 rounded-full ${Date.now() >= new Date(list.expiresAt).getTime() ? "bg-red-500" : "bg-green-500"}`} />
+                              </span>
+                            </div>
+                            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
+                              <span className="font-mono">{list.id}</span>
+                              <span>{formatDateTime(list.createdAt)}</span>
+                              <span className="inline-flex items-center gap-1 font-semibold"><Users size={13} /> {list.participantCount} peserta</span>
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
             </div>
           )}
         </section>
