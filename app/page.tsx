@@ -779,7 +779,7 @@ export default function Page() {
                             <div className="flex items-center justify-between gap-3">
                               <span className="truncate text-base font-bold">{list.listName}</span>
                               <span className={`flex shrink-0 items-center gap-1.5 text-xs font-semibold ${Date.now() >= new Date(list.expiresAt).getTime() ? "text-red-700" : "text-green-700"}`}>
-                                {Date.now() >= new Date(list.expiresAt).getTime() ? "Ditutup" : "Dibuka"}
+                                {Date.now() >= new Date(list.expiresAt).getTime() ? "Ditutup" : "AKTIF"}
                                 <span aria-hidden="true" className={`size-2 rounded-full ${Date.now() >= new Date(list.expiresAt).getTime() ? "bg-red-500" : "bg-green-500"}`} />
                               </span>
                             </div>
