@@ -470,7 +470,7 @@ export default function Page() {
                     />
                   </label>
                   <button className={`${primary} w-full`} disabled={loading}>
-                    {loading ? "Creating…" : "Create a list"} <Plus size={17} />
+                    {loading ? "Creating…" : "Create"} <Plus size={17} />
                   </button>
                 </form>
               )}
