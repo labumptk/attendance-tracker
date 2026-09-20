@@ -718,44 +718,46 @@ export default function Page() {
                       href={`/list/${list.id}`}
                       key={list.id}
                       aria-label={`Buka detail daftar ${list.listName}`}
-                      className="block rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-gray-400 hover:shadow-md"
+                      className="block rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm transition hover:-translate-y-0.5 hover:border-gray-400 hover:shadow-md"
                     >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex items-start gap-3">
-                          <input
-                            type="checkbox"
-                            checked={selected.includes(list.id)}
-                            aria-label={`Pilih daftar ${list.listName}`}
-                            onClick={(e) => e.stopPropagation()}
-                            onChange={(e) =>
-                              setSelected((current) =>
-                                e.target.checked
-                                  ? [...current, list.id]
-                                  : current.filter((id) => id !== list.id),
-                              )
-                            }
-                            className="mt-1 h-4 w-4 accent-black"
-                          />
-                          <span>
-                            <span className="block text-xl font-bold">
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="checkbox"
+                          checked={selected.includes(list.id)}
+                          aria-label={`Pilih daftar ${list.listName}`}
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={(e) =>
+                            setSelected((current) =>
+                              e.target.checked
+                                ? [...current, list.id]
+                                : current.filter((id) => id !== list.id),
+                            )
+                          }
+                          className="size-4 shrink-0 accent-black"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="truncate text-base font-bold">
                               {list.listName}
                             </span>
-                            <span className="font-mono text-xs text-gray-500">
-                              {list.id}
+                            <span
+                              className={`flex shrink-0 items-center gap-1.5 text-xs font-semibold ${Date.now() >= new Date(list.expiresAt).getTime() ? "text-red-700" : "text-green-700"}`}
+                            >
+                              {Date.now() >= new Date(list.expiresAt).getTime() ? "Ditutup" : "Dibuka"}
+                              <span
+                                aria-hidden="true"
+                                className={`size-2 rounded-full ${Date.now() >= new Date(list.expiresAt).getTime() ? "bg-red-500" : "bg-green-500"}`}
+                              />
                             </span>
-                            <span className="mt-1 block text-xs text-gray-500">
-                              Dibuat {formatDateTime(list.createdAt)}
+                          </div>
+                          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
+                            <span className="font-mono">{list.id}</span>
+                            <span>{formatDateTime(list.createdAt)}</span>
+                            <span className="inline-flex items-center gap-1 font-semibold">
+                              <Users size={13} /> {list.participantCount} peserta
                             </span>
-                          </span>
+                          </div>
                         </div>
-                      </div>
-                      <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
-                        <div className="flex items-center gap-2 font-semibold text-gray-600">
-                          <Users size={16} /> {list.participantCount} peserta
-                        </div>
-                        <p className={`rounded-lg px-3 py-2 text-xs font-semibold ${Date.now() >= new Date(list.expiresAt).getTime() ? "bg-red-50 text-red-700" : "bg-gray-100 text-gray-600"}`}>
-                          {Date.now() >= new Date(list.expiresAt).getTime() ? "Telah ditutup" : "Aktif"}
-                        </p>
                       </div>
                     </Link>
                   ))}
