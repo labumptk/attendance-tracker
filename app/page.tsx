@@ -426,6 +426,18 @@ export default function Page() {
               ) : (
                 <form onSubmit={handleCreate} className="space-y-5">
                   <label className="block text-sm font-semibold">
+                    List name
+                    <input
+                      className={field}
+                      value={listName}
+                      onChange={(e) =>
+                        setListName(e.target.value.toUpperCase().slice(0, 8))
+                      }
+                      maxLength={8}
+                      required
+                    />
+                  </label>
+                  <label className="block text-sm font-semibold">
                     List password
                     <input
                       className={field}
@@ -437,26 +449,12 @@ export default function Page() {
                     />
                   </label>
                   <label className="block text-sm font-semibold">
-                    List name
-                    <input
-                      className={field}
-                      value={listName}
-                      onChange={(e) =>
-                        setListName(e.target.value.toUpperCase().slice(0, 8))
-                      }
-                      maxLength={8}
-                      placeholder="Rapat"
-                      required
-                    />
-                  </label>
-                  <label className="block text-sm font-semibold">
                     Host password
                     <input
                       className={field}
                       type="password"
                       value={masterPassword}
                       onChange={(e) => setMasterPassword(e.target.value)}
-                      placeholder="Enter the host password"
                       required
                     />
                   </label>
