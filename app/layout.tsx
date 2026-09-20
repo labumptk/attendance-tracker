@@ -4,7 +4,7 @@ import './globals.css'
 
 export const metadata: Metadata = {
   title: 'Hadir — Simple attendance lists',
-  description: 'Buat daftar kehadiran pribadi dan biarkan peserta mencatat kehadiran dengan ID empat karakter.',
+  description: 'Create private attendance lists and let participants check in with a four-character ID.',
   generator: 'v0.app',
   icons: {
     icon: '/icon.svg',

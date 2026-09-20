@@ -235,7 +235,7 @@ export default function Page() {
     );
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `hadir-${list.id}.csv`;
+    link.download = `attendance-${list.id}.csv`;
     link.click();
     URL.revokeObjectURL(link.href);
   }
@@ -265,7 +265,7 @@ export default function Page() {
     }).format(new Date(value));
   const formattedCloseTime = expiresAt
     ? formatDateTime(expiresAt)
-    : "2,5 jam setelah daftar dibuat";
+    : "2.5 hours after the list is created";
 
   return (
     <main className="min-h-screen bg-[#f8f9fa] text-black">
@@ -274,7 +274,7 @@ export default function Page() {
           <button
             onClick={reset}
             className="flex items-center gap-3"
-            aria-label="Ke beranda"
+            aria-label="Go to home"
           >
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e9ecef] shadow-lg shadow-black/10">
               <ListChecks size={21} />
@@ -346,7 +346,7 @@ export default function Page() {
                 >
                   <img
                     src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-dMn7yPabzUeKY3v5i1lErYxsfj2i34-eshualed8coqZh0eEbJjYlMFtgMT8v.png"
-                    alt="Ilustrasi daftar hadir dengan pensil"
+                    alt="Attendance list illustration with a pencil"
                     className="mb-6 h-20 w-20 rounded-xl object-cover"
                   />
                   <span className="block text-xl font-bold">
@@ -388,7 +388,7 @@ export default function Page() {
                       <button
                         onClick={() => copyText(created.id)}
                         className="rounded-lg p-2 text-gray-800 hover:bg-gray-100"
-                        aria-label="Salin List ID"
+                        aria-label="Copy List ID"
                       >
                         {copied ? <Check size={20} /> : <Clipboard size={20} />}
                       </button>
@@ -399,7 +399,7 @@ export default function Page() {
                       Participant link
                     </p>
                     <p className="mt-2 break-all text-xs leading-5 text-gray-500">
-                      Participants dapat langsung menulis nama melalui tautan ini.
+                      Participants can enter their names directly through this link.
                     </p>
                     <button
                       onClick={() => copyText(shareLink)}
@@ -477,10 +477,10 @@ export default function Page() {
                   Host dashboard
                 </p>
                 <h2 className="text-4xl font-bold tracking-tight">
-                  Kelola semua daftar
+                  Manage all lists
                 </h2>
                 <p className="mt-3 text-gray-500">
-                  Enter the host password untuk melihat dan menghapus daftar.
+                  Enter the host password to view and delete lists.
                 </p>
               </div>
               <form onSubmit={handleHost} className="space-y-5">
@@ -495,7 +495,7 @@ export default function Page() {
                   />
                 </label>
                 <button className={`${primary} w-full`} disabled={loading}>
-                  {loading ? "Checking…" : "Buka dasbor"} <Users size={17} />
+                  {loading ? "Checking…" : "Open dashboard"} <Users size={17} />
                 </button>
               </form>
               {message && (
@@ -513,21 +513,21 @@ export default function Page() {
                 <>
                   <img
                     src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-NNCYMFaFanN3dfe9VYG3WkxPzRezVL-MAn7LFyTIYrcjHjFTPLEbGxQkMFls3.png"
-                    alt="Ilustrasi perangkat sudah mengisi daftar hadir"
+                    alt="Illustration of a device that has already checked in"
                     className="mx-auto mb-5 h-48 w-48 rounded-2xl object-cover"
                   />
                   <div
                     className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800"
                     role="alert"
                   >
-                    Anda kan sudah mengisi Attendance List {participantListName}{" "}
-                    tadi. Lupa ya?
+You already checked in to Attendance List {participantListName}{" "}
+earlier. Did you forget?
                   </div>
                 </>
               )}
               <div className="mb-8">
                 <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-gray-700">
-                  Akses peserta
+                  Participant access
                 </p>
                 <h2 className="text-4xl font-bold tracking-tight">
                   {participantReady || directJoin
@@ -561,7 +561,7 @@ export default function Page() {
                     </p>
                   </div>
                   <button onClick={reset} className={`${primary} w-full`}>
-                    Selesai
+                    Done
                   </button>
                 </div>
               ) : (
@@ -583,7 +583,7 @@ export default function Page() {
                         >
                           {participantClosed
                             ? "This attendance list closed on"
-                            : "Attendance List akan ditutup pada"}
+                            : "The attendance list will close on"}
                         </span>{" "}
                         {formattedCloseTime}
                       </div>
@@ -618,7 +618,7 @@ export default function Page() {
                             ? "Menyimpan…"
                             : duplicateName
                               ? "Your name is already on the list"
-                              : "Catat saya hadir"}{" "}
+                              : "Record my attendance"}{" "}
                         <Check size={17} />
                       </button>
                     </>
@@ -673,7 +673,7 @@ export default function Page() {
                     Host dashboard
                   </p>
                   <h2 className="text-4xl font-bold tracking-tight">
-                    Semua daftar Anda
+                    All your lists
                   </h2>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -686,7 +686,7 @@ export default function Page() {
                     }}
                     className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-black px-3 text-sm font-semibold text-white hover:bg-gray-800"
                   >
-                    <Plus size={16} /> Create a list baru
+                    <Plus size={16} /> Create a new list
                   </button>
                   <button
                     onClick={removeSelected}
@@ -710,12 +710,12 @@ export default function Page() {
                   <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
                     <div className="mb-5 flex items-start justify-between gap-4">
                       <div>
-                        <p className="text-xs font-bold uppercase tracking-[0.18em] text-gray-500">Detail daftar</p>
+                        <p className="text-xs font-bold uppercase tracking-[0.18em] text-gray-500">List details</p>
                         <h3 className="mt-2 text-2xl font-bold">{selectedList.listName}</h3>
                         <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm text-gray-500">
                           <span>Code: <strong className="font-mono text-gray-900">{selectedList.id}</strong></span>
                           <span>Created: {formatDateTime(selectedList.createdAt)}</span>
-                          <span>{selectedList.participants.length} peserta</span>
+                          <span>{selectedList.participants.length} participants</span>
                         </div>
                       </div>
 <div
@@ -734,10 +734,10 @@ export default function Page() {
                           onChange={(e) => setParticipantSort((current) => ({ ...current, [selectedList.id]: e.target.value as "az" | "za" | "newest" | "oldest" }))}
                           className="bg-transparent outline-none"
                         >
-                          <option value="az">A ke Z</option>
-                          <option value="za">Z ke A</option>
-                          <option value="newest">Terbaru</option>
-                          <option value="oldest">Terlama</option>
+                          <option value="az">A to Z</option>
+                          <option value="za">Z to A</option>
+                          <option value="newest">Newest</option>
+                          <option value="oldest">Oldest</option>
                         </select>
                       </label>
                     </div>
@@ -754,7 +754,7 @@ export default function Page() {
                       ))}
                       {selectedList.participants.length === 0 && <p className="px-4 py-6 text-center text-sm text-gray-500">No participants yet.</p>}
                     </div>
-                    <button onClick={() => setSelectedList(null)} className="mt-5 text-sm font-semibold text-gray-500 hover:text-black">← Back ke semua daftar</button>
+                    <button onClick={() => setSelectedList(null)} className="mt-5 text-sm font-semibold text-gray-500 hover:text-black">← Back to all lists</button>
                   </div>
                 ) : (
                   <div className="grid gap-4 md:grid-cols-2">
@@ -763,14 +763,14 @@ export default function Page() {
                         type="button"
                         onClick={() => openListDetails(list)}
                         key={list.id}
-                        aria-label={`Buka detail daftar ${list.listName}`}
+                        aria-label={`Open details for ${list.listName}`}
                         className="block w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-gray-400 hover:shadow-md"
                       >
                         <div className="flex items-center gap-3">
                           <input
                             type="checkbox"
                             checked={selected.includes(list.id)}
-                            aria-label={`Pilih daftar ${list.listName}`}
+                            aria-label={`Select ${list.listName}`}
                             onClick={(e) => e.stopPropagation()}
                             onChange={(e) => setSelected((current) => e.target.checked ? [...current, list.id] : current.filter((id) => id !== list.id))}
                             className="size-4 shrink-0 accent-black"
@@ -786,7 +786,7 @@ export default function Page() {
                             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
                               <span className="font-mono">{list.id}</span>
                               <span>{formatDateTime(list.createdAt)}</span>
-                              <span className="inline-flex items-center gap-1 font-semibold"><Users size={13} /> {list.participantCount} peserta</span>
+                              <span className="inline-flex items-center gap-1 font-semibold"><Users size={13} /> {list.participantCount} participants</span>
                             </div>
                           </div>
                         </div>
@@ -798,7 +798,7 @@ export default function Page() {
           )}
         </section>
         <footer className="flex items-center justify-center gap-2 pb-2 text-xs text-gray-400">
-          <LockKeyhole size={13} /> Privat dengan kata sandi host
+          <LockKeyhole size={13} /> Private with a host password
         </footer>
       </div>
     </main>
