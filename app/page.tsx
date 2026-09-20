@@ -212,7 +212,7 @@ export default function Page() {
       ...list.participants.map((p) => [
         p.fullName,
         p.ipAddress,
-        p.createdAt ? new Date(p.createdAt).toISOString() : "",
+        p.createdAt ? formatDateTime(p.createdAt) : "",
       ]),
     ];
     const blob = new Blob(
@@ -239,11 +239,16 @@ export default function Page() {
     expiresAt && Date.now() >= new Date(expiresAt).getTime(),
   );
   const duplicateName = message.toLowerCase().includes("sudah ada");
-  const formatDateTime = (value: Date | string) => {
-    const date = new Date(value);
-    const pad = (part: number) => String(part).padStart(2, "0");
-    return `${pad(date.getUTCDate())}/${pad(date.getUTCMonth() + 1)}/${date.getUTCFullYear()} ${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())}`;
-  };
+  const formatDateTime = (value: Date | string) =>
+    new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Asia/Jakarta",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23",
+    }).format(new Date(value));
   const formattedCloseTime = expiresAt
     ? formatDateTime(expiresAt)
     : "2,5 jam setelah daftar dibuat";
