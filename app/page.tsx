@@ -718,10 +718,16 @@ export default function Page() {
                           <span>{selectedList.participants.length} peserta</span>
                         </div>
                       </div>
-                      <span className={`flex shrink-0 items-center gap-1.5 text-xs font-semibold ${Date.now() >= new Date(selectedList.expiresAt).getTime() ? "text-red-700" : "text-green-700"}`}>
-                        {Date.now() >= new Date(selectedList.expiresAt).getTime() ? "Ditutup" : "Dibuka"}
-                        <span aria-hidden="true" className={`size-2 rounded-full ${Date.now() >= new Date(selectedList.expiresAt).getTime() ? "bg-red-500" : "bg-green-500"}`} />
-                      </span>
+<div
+                          className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold ${Date.now() >= new Date(selectedList.expiresAt).getTime() ? "border-red-200 bg-red-50 text-red-800" : "border-green-200 bg-green-50 text-green-800"}`}
+                          role="status"
+                        >
+                          <span
+                            aria-hidden="true"
+                            className={`size-2.5 rounded-full ${Date.now() >= new Date(selectedList.expiresAt).getTime() ? "bg-red-500" : "bg-green-500"}`}
+                          />
+                          {Date.now() >= new Date(selectedList.expiresAt).getTime() ? "Daftar ditutup" : "Daftar dibuka"}
+                        </div>
                     </div>
                     <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                       <h4 className="font-semibold">Peserta</h4>
