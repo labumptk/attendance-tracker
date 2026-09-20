@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import {
   ArrowLeft,
@@ -713,40 +714,39 @@ export default function Page() {
               ) : (
                 <div className="grid gap-4 md:grid-cols-2">
                   {hostLists.map((list) => (
-                    <a
+                    <Link
                       href={`/list/${list.id}`}
                       key={list.id}
                       aria-label={`Buka detail daftar ${list.listName}`}
                       className="block rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-gray-400 hover:shadow-md"
                     >
-                      <div className="cursor-pointer">
-                        <div className="flex items-start justify-between gap-3">
-                          <label className="flex items-start gap-3">
-                            <input
-                              type="checkbox"
-                              checked={selected.includes(list.id)}
-                              onClick={(e) => e.stopPropagation()}
-                              onChange={(e) =>
-                                setSelected((current) =>
-                                  e.target.checked
-                                    ? [...current, list.id]
-                                    : current.filter((id) => id !== list.id),
-                                )
-                              }
-                              className="mt-1 h-4 w-4 accent-black"
-                            />
-                            <span>
-                              <span className="block text-xl font-bold">
-                                {list.listName}
-                              </span>
-                              <span className="font-mono text-xs text-gray-500">
-                                {list.id}
-                              </span>
-                              <span className="mt-1 block text-xs text-gray-500">
-                                Dibuat {formatDateTime(list.createdAt)}
-                              </span>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-3">
+                          <input
+                            type="checkbox"
+                            checked={selected.includes(list.id)}
+                            aria-label={`Pilih daftar ${list.listName}`}
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={(e) =>
+                              setSelected((current) =>
+                                e.target.checked
+                                  ? [...current, list.id]
+                                  : current.filter((id) => id !== list.id),
+                              )
+                            }
+                            className="mt-1 h-4 w-4 accent-black"
+                          />
+                          <span>
+                            <span className="block text-xl font-bold">
+                              {list.listName}
                             </span>
-                          </label>
+                            <span className="font-mono text-xs text-gray-500">
+                              {list.id}
+                            </span>
+                            <span className="mt-1 block text-xs text-gray-500">
+                              Dibuat {formatDateTime(list.createdAt)}
+                            </span>
+                          </span>
                         </div>
                       </div>
                       <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
@@ -757,7 +757,7 @@ export default function Page() {
                           {Date.now() >= new Date(list.expiresAt).getTime() ? "Telah ditutup" : "Aktif"}
                         </p>
                       </div>
-                    </a>
+                    </Link>
                   ))}
                 </div>
               )}
