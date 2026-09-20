@@ -554,7 +554,11 @@ earlier. Did you forget?
               {message === "Your attendance has been recorded." ? (
                 <div className="space-y-5">
                   <div className="rounded-2xl border border-gray-200 bg-white p-6 text-center">
-                    <Check className="mx-auto text-gray-700" size={32} />
+                    <img
+                      src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/jump-TwqW1TKuFRMztPmV7w6eHEmsc1s2YJ.png"
+                      alt="Joyful person jumping with both hands raised"
+                      className="mx-auto mb-4 h-48 w-48 rounded-2xl object-cover"
+                    />
                     <p className="mt-3 text-lg font-bold">Attendance recorded</p>
                     <p className="mt-1 text-sm text-gray-700">
                       Your name and check-in time have been saved.
