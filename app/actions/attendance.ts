@@ -23,7 +23,7 @@ export async function createAttendanceList(listName: string, listPassword: strin
   if (hostPassword !== creatorPassword) return { error: 'Kata sandi host tidak sesuai.' }
   const parsedName = listNameSchema.safeParse(listName)
   const parsedPassword = listPasswordSchema.safeParse(listPassword)
-  if (!parsedName.success) return { error: 'Nama daftar wajib diisi dan maksimal 8 karakter.' }
+  if (!parsedName.success) return { error: 'List name is required and must be 8 characters or fewer.' }
   if (!parsedPassword.success) return { error: 'Gunakan kata sandi daftar antara 4 dan 64 karakter.' }
 
   for (let attempt = 0; attempt < 5; attempt += 1) {
@@ -77,7 +77,7 @@ export async function getAttendanceList(listId: string, password: string, mode: 
   const parsedId = listIdSchema.safeParse(listId)
   if (!parsedId.success) return { error: 'List ID must be 4 characters.' }
   const list = await db.select().from(attendanceLists).where(eq(attendanceLists.id, parsedId.data)).limit(1)
-  if (!list[0]) return { error: 'Tidak ada ID tersebut di daftar hadir' }
+  if (!list[0]) return { error: 'That ID was not found in the attendance list.' }
   const validPassword = mode === 'host' ? password === creatorPassword : password === list[0].listPassword
   if (!validPassword) return { error: 'That password is not correct.' }
   const participants = await db.select().from(attendanceParticipants).where(eq(attendanceParticipants.listId, parsedId.data)).orderBy(asc(attendanceParticipants.createdAt))
@@ -94,7 +94,7 @@ export async function addParticipant(listId: string, password: string, fullName:
   if (!parsedName.success) return { error: 'Enter your full name.' }
   const list = await db.select({ id: attendanceLists.id, expiresAt: attendanceLists.expiresAt }).from(attendanceLists).where(and(eq(attendanceLists.id, parsedId.data), eq(attendanceLists.listPassword, password))).limit(1)
   if (!list[0]) return { error: 'List ID atau kata sandi tidak sesuai.' }
-  if (list[0].expiresAt.getTime() <= Date.now()) return { error: 'Daftar hadir ini telah ditutup.' }
+  if (list[0].expiresAt.getTime() <= Date.now()) return { error: 'This attendance list is closed.' }
   const existingParticipant = await db.select({ id: attendanceParticipants.id }).from(attendanceParticipants).where(and(eq(attendanceParticipants.listId, parsedId.data), eq(attendanceParticipants.fullName, parsedName.data))).limit(1)
   if (existingParticipant.length > 0) return { error: 'nama anda sudah ada di dalam daftar hadir' }
   const requestHeaders = await headers()

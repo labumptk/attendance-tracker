@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Hadir — Daftar kehadiran sederhana',
+  title: 'Hadir — Simple attendance lists',
   description: 'Buat daftar kehadiran pribadi dan biarkan peserta mencatat kehadiran dengan ID empat karakter.',
   generator: 'v0.app',
   icons: {
