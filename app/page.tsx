@@ -664,7 +664,7 @@ earlier. Did you forget?
                       alt="Joyful person jumping with both hands raised"
                       className="mx-auto mb-4 h-48 w-48 rounded-2xl object-cover"
                     />
-                    <p className="mt-3 text-lg font-bold">Attendance recorded</p>
+                    <p className="mt-3 text-lg font-bold">Kudos!</p>
                     <p className="mt-1 text-sm text-gray-700">
                       Your name and check-in time have been saved.
                     </p>
@@ -898,10 +898,9 @@ earlier. Did you forget?
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between gap-3">
                               <span className="truncate text-base font-bold">{list.listName}</span>
-                              <span className={`flex shrink-0 items-center gap-1.5 text-xs font-semibold ${Date.now() >= new Date(list.expiresAt).getTime() ? "text-red-700" : "text-green-700"}`}>
-                                {Date.now() >= new Date(list.expiresAt).getTime() ? "INACTIVE" : "ACTIVE"}
-                                <span aria-hidden="true" className={`size-2 rounded-full ${Date.now() >= new Date(list.expiresAt).getTime() ? "bg-red-500" : "bg-green-500"}`} />
-                              </span>
+<span className={`flex shrink-0 items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${Date.now() >= new Date(list.expiresAt).getTime() ? "border-gray-200 bg-gray-100 text-gray-700" : "border-green-200 bg-green-50 text-green-800"}`}>
+    {Date.now() >= new Date(list.expiresAt).getTime() ? "INACTIVE" : "ACTIVE"}
+  </span>
                             </div>
                             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
                               <span className="font-mono">{list.id}</span>
