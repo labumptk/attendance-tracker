@@ -8,6 +8,7 @@ import {
   Clipboard,
   ListChecks,
   LockKeyhole,
+  LogOut,
   Plus,
   Trash2,
   Users,
@@ -300,7 +301,7 @@ export default function Page() {
               onClick={reset}
               className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-black"
             >
-              {mode === "host" ? "Logout" : <><ArrowLeft size={16} /> Back</>}
+              {mode === "host" ? <><LogOut size={16} aria-hidden="true" /> Logout</> : <><ArrowLeft size={16} /> Back</>}
             </button>
           )}
         </header>
