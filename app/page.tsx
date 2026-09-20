@@ -730,8 +730,7 @@ export default function Page() {
                 <div className="rounded-2xl border border-gray-200 bg-white px-5 py-16 text-center text-sm text-gray-500">
                   Belum ada daftar kehadiran.
                 </div>
-              ) : (
-                selectedList ? (
+              ) : selectedList ? (
                   <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
                     <div className="mb-5 flex items-start justify-between gap-4">
                       <div>
@@ -817,8 +816,7 @@ export default function Page() {
                       </button>
                     ))}
                   </div>
-                )
-              )}
+                )}
             </div>
           )}
         </section>
