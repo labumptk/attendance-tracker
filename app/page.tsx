@@ -536,7 +536,7 @@ export default function Page() {
                     priority
                   />
                   <p className="max-w-sm text-lg font-semibold leading-7 text-gray-900">
-                    There is no such ID in our database. Would you like to try again?
+                    There is no such ID in our database.
                   </p>
                   <button
                     type="button"
