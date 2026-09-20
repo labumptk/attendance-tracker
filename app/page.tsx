@@ -98,7 +98,7 @@ export default function Page() {
     e.preventDefault();
     const normalizedName = listName.trim().toUpperCase();
     if (!/^\d{4}$/.test(password)) {
-      setMessage("Kata sandi daftar harus terdiri dari 4 digit angka.");
+      setMessage("The list password must contain 4 digits.");
       return;
     }
     setLoading(true);
@@ -118,7 +118,7 @@ export default function Page() {
       );
       setListId(result.id);
       setPassword("");
-      setMessage("Daftar dibuat. Tautan peserta siap dibagikan.");
+      setMessage("List created. The participant link is ready to share.");
     }
   }
   async function handleJoin(e: FormEvent<HTMLFormElement>) {
@@ -170,7 +170,7 @@ export default function Page() {
     if ("error" in result) setMessage(result.error);
     else {
       setName("");
-      setMessage("Kehadiran Anda telah dicatat.");
+      setMessage("Your attendance has been recorded.");
     }
   }
   async function copyText(text: string) {
@@ -179,7 +179,7 @@ export default function Page() {
     setTimeout(() => setCopied(false), 1500);
   }
   async function removeSelected() {
-    if (!confirm("Hapus daftar yang dipilih beserta seluruh pesertanya?"))
+    if (!confirm("Delete the selected lists and all their participants?"))
       return;
     setLoading(true);
     const result = await deleteAttendanceLists(password, selected);
@@ -190,11 +190,11 @@ export default function Page() {
         lists.filter((list) => !selected.includes(list.id)),
       );
       setSelected([]);
-      setMessage("Daftar terpilih telah dihapus.");
+      setMessage("Selected lists have been deleted.");
     }
   }
   async function removeParticipant(listId: string, participantId: string) {
-    if (!confirm("Hapus peserta ini dari daftar?")) return;
+    if (!confirm("Remove this participant from the list?")) return;
     setLoading(true);
     const result = await deleteAttendanceParticipant(
       password,
@@ -216,13 +216,13 @@ export default function Page() {
             : list,
         ),
       );
-      setMessage("Peserta telah dihapus.");
+      setMessage("Participants telah dihapus.");
     }
   }
   function exportCsv(list: HostList) {
     const esc = (value: string) => `"${value.replace(/"/g, '""')}"`;
     const rows = [
-      ["Nama", "Alamat IP", "Waktu"],
+      ["Name", "IP address", "Time"],
       ...list.participants.map((p) => [
         p.fullName,
         p.ipAddress,
@@ -235,7 +235,7 @@ export default function Page() {
     );
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `hadir-${list.id}.csv`;
+    link.download = `attendance-${list.id}.csv`;
     link.click();
     URL.revokeObjectURL(link.href);
   }
@@ -246,9 +246,9 @@ export default function Page() {
   const error =
     message &&
     !message.toLowerCase().includes("sudah ada") &&
-    message !== "Kehadiran Anda telah dicatat." &&
-    message !== "Daftar dibuat. Tautan peserta siap dibagikan." &&
-    message !== "Daftar terpilih telah dihapus.";
+    message !== "Your attendance has been recorded." &&
+    message !== "List created. The participant link is ready to share." &&
+    message !== "Selected lists have been deleted.";
   const participantClosed = Boolean(
     expiresAt && Date.now() >= new Date(expiresAt).getTime(),
   );
@@ -265,7 +265,7 @@ export default function Page() {
     }).format(new Date(value));
   const formattedCloseTime = expiresAt
     ? formatDateTime(expiresAt)
-    : "2,5 jam setelah daftar dibuat";
+    : "2.5 hours after the list is created";
 
   return (
     <main className="min-h-screen bg-[#f8f9fa] text-black">
@@ -274,7 +274,7 @@ export default function Page() {
           <button
             onClick={reset}
             className="flex items-center gap-3"
-            aria-label="Ke beranda"
+            aria-label="Go to home"
           >
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e9ecef] shadow-lg shadow-black/10">
               <ListChecks size={21} />
@@ -286,7 +286,7 @@ export default function Page() {
               onClick={reset}
               className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-black"
             >
-              <ArrowLeft size={16} /> Kembali
+              <ArrowLeft size={16} /> Back
             </button>
           )}
         </header>
@@ -295,7 +295,7 @@ export default function Page() {
             <div className="w-full max-w-4xl">
               <div className="mb-12 max-w-2xl">
                 <h1 className="text-5xl font-bold leading-[1.05] tracking-tight sm:text-7xl">
-                  Daftar Hadir
+                  Attendance List
                 </h1>
                 <p className="mt-3 text-sm text-gray-500">
                   oleh Rachmat Wahid Saleh Insani
@@ -309,12 +309,12 @@ export default function Page() {
                   <span className="mb-4 flex h-9 w-9 items-center justify-center rounded-lg bg-[#f8f9fa] text-gray-700">
                     <Plus size={18} />
                   </span>
-                  <span className="block text-base font-bold">Buat daftar</span>
+                  <span className="block text-base font-bold">Create a list</span>
                   <span className="mt-1 block text-xs leading-5 text-gray-500">
-                    Mulai daftar baru dan dapatkan ID unik.
+                    Start a new list and get a unique ID.
                   </span>
                   <span className="mt-4 block text-xs font-semibold text-gray-700">
-                    Saya host →
+                    I am the host →
                   </span>
                 </button>
                 <button
@@ -328,13 +328,13 @@ export default function Page() {
                     <LockKeyhole size={18} />
                   </span>
                   <span className="block text-base font-bold">
-                    Kelola daftar
+                    Manage lists
                   </span>
                   <span className="mt-1 block text-xs leading-5 text-gray-500">
-                    Kelola semua daftar dengan satu kata sandi host.
+                    Manage all lists with one host password.
                   </span>
                   <span className="mt-4 block text-xs font-semibold text-gray-700">
-                    Buka dasbor host →
+                    Open host dashboard →
                   </span>
                 </button>
                 <button
@@ -346,17 +346,17 @@ export default function Page() {
                 >
                   <img
                     src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-dMn7yPabzUeKY3v5i1lErYxsfj2i34-eshualed8coqZh0eEbJjYlMFtgMT8v.png"
-                    alt="Ilustrasi daftar hadir dengan pensil"
+                    alt="Attendance list illustration with a pencil"
                     className="mb-6 h-20 w-20 rounded-xl object-cover"
                   />
                   <span className="block text-xl font-bold">
-                    Mengisi kehadiran
+                    Record attendance
                   </span>
                   <span className="mt-2 block text-sm leading-6 text-gray-500">
-                    Masukkan ID dan kata sandi untuk hadir.
+                    Enter the ID and password to check in.
                   </span>
                   <span className="mt-6 block text-sm font-semibold text-gray-700">
-                    Saya peserta →
+                    I am a participant →
                   </span>
                 </button>
               </div>
@@ -366,10 +366,10 @@ export default function Page() {
             <div className="w-full max-w-md">
               <div className="mb-8">
                 <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-gray-700">
-                  Daftar kehadiran baru
+                  New attendance list
                 </p>
                 <h2 className="text-4xl font-bold tracking-tight">
-                  Buat daftar
+                  Create a list
                 </h2>
               </div>
               {created ? (
@@ -379,7 +379,7 @@ export default function Page() {
                       {created.name}
                     </p>
                     <p className="mt-3 text-sm font-semibold text-gray-700">
-                      ID daftar
+                      List ID
                     </p>
                     <div className="mt-2 flex items-center justify-between">
                       <span className="text-4xl font-bold tracking-[0.3em]">
@@ -388,7 +388,7 @@ export default function Page() {
                       <button
                         onClick={() => copyText(created.id)}
                         className="rounded-lg p-2 text-gray-800 hover:bg-gray-100"
-                        aria-label="Salin ID daftar"
+                        aria-label="Copy List ID"
                       >
                         {copied ? <Check size={20} /> : <Clipboard size={20} />}
                       </button>
@@ -396,17 +396,17 @@ export default function Page() {
                   </div>
                   <div className="rounded-2xl border border-gray-200 bg-white p-5">
                     <p className="text-sm font-semibold text-gray-700">
-                      Tautan peserta
+                      Participant link
                     </p>
                     <p className="mt-2 break-all text-xs leading-5 text-gray-500">
-                      Peserta dapat langsung menulis nama melalui tautan ini.
+                      Participants can enter their names directly through this link.
                     </p>
                     <button
                       onClick={() => copyText(shareLink)}
                       className="mt-4 inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-[#f8f9fa] px-4 text-sm font-semibold text-gray-800 hover:border-gray-400"
                     >
                       <Clipboard size={16} />{" "}
-                      {copied ? "Tautan tersalin" : "Salin tautan peserta"}
+                      {copied ? "Link copied" : "Copy participant link"}
                     </button>
                   </div>
                   <button
@@ -417,14 +417,14 @@ export default function Page() {
                     }}
                     className={`${primary} w-full`}
                   >
-                    Buka dasbor host{" "}
+                    Open host dashboard{" "}
                     <ArrowLeft className="rotate-180" size={17} />
                   </button>
                 </div>
               ) : (
                 <form onSubmit={handleCreate} className="space-y-5">
                   <label className="block text-sm font-semibold">
-                    Nama daftar
+                    List name
                     <input
                       className={field}
                       value={listName}
@@ -437,18 +437,18 @@ export default function Page() {
                     />
                   </label>
                   <label className="block text-sm font-semibold">
-                    Kata sandi host
+                    Host password
                     <input
                       className={field}
                       type="password"
                       value={masterPassword}
                       onChange={(e) => setMasterPassword(e.target.value)}
-                      placeholder="Masukkan kata sandi host"
+                      placeholder="Enter the host password"
                       required
                     />
                   </label>
                   <label className="block text-sm font-semibold">
-                    Kata sandi daftar
+                    List password
                     <input
                       className={field}
                       type="password"
@@ -459,7 +459,7 @@ export default function Page() {
                     />
                   </label>
                   <button className={`${primary} w-full`} disabled={loading}>
-                    {loading ? "Membuat…" : "Buat daftar"} <Plus size={17} />
+                    {loading ? "Creating…" : "Create a list"} <Plus size={17} />
                   </button>
                 </form>
               )}
@@ -474,18 +474,18 @@ export default function Page() {
             <div className="w-full max-w-md">
               <div className="mb-8">
                 <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-gray-700">
-                  Dasbor host
+                  Host dashboard
                 </p>
                 <h2 className="text-4xl font-bold tracking-tight">
-                  Kelola semua daftar
+                  Manage all lists
                 </h2>
                 <p className="mt-3 text-gray-500">
-                  Masukkan kata sandi host untuk melihat dan menghapus daftar.
+                  Enter the host password to view and delete lists.
                 </p>
               </div>
               <form onSubmit={handleHost} className="space-y-5">
                 <label className="block text-sm font-semibold">
-                  Kata sandi host
+                  Host password
                   <input
                     className={field}
                     type="password"
@@ -495,7 +495,7 @@ export default function Page() {
                   />
                 </label>
                 <button className={`${primary} w-full`} disabled={loading}>
-                  {loading ? "Memeriksa…" : "Buka dasbor"} <Users size={17} />
+                  {loading ? "Checking…" : "Open dashboard"} <Users size={17} />
                 </button>
               </form>
               {message && (
@@ -513,30 +513,30 @@ export default function Page() {
                 <>
                   <img
                     src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-NNCYMFaFanN3dfe9VYG3WkxPzRezVL-MAn7LFyTIYrcjHjFTPLEbGxQkMFls3.png"
-                    alt="Ilustrasi perangkat sudah mengisi daftar hadir"
+                    alt="Illustration of a device that has already checked in"
                     className="mx-auto mb-5 h-48 w-48 rounded-2xl object-cover"
                   />
                   <div
                     className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800"
                     role="alert"
                   >
-                    Anda kan sudah mengisi Daftar Hadir {participantListName}{" "}
-                    tadi. Lupa ya?
+You already checked in to Attendance List {participantListName}{" "}
+earlier. Did you forget?
                   </div>
                 </>
               )}
               <div className="mb-8">
                 <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-gray-700">
-                  Akses peserta
+                  Participant access
                 </p>
                 <h2 className="text-4xl font-bold tracking-tight">
                   {participantReady || directJoin
-                    ? participantListName || "Catat kehadiran"
-                    : "Catat kehadiran"}
+                    ? participantListName || "Record attendance"
+                    : "Record attendance"}
                 </h2>
                 {!(participantReady || directJoin) && (
                   <p className="mt-3 text-gray-500">
-                    Masukkan informasi yang dibagikan oleh host.
+                    Enter the information shared by the host.
                   </p>
                 )}
               </div>
@@ -551,17 +551,17 @@ export default function Page() {
                     {error}
                   </div>
                 )}
-              {message === "Kehadiran Anda telah dicatat." ? (
+              {message === "Your attendance has been recorded." ? (
                 <div className="space-y-5">
                   <div className="rounded-2xl border border-gray-200 bg-white p-6 text-center">
                     <Check className="mx-auto text-gray-700" size={32} />
-                    <p className="mt-3 text-lg font-bold">Kehadiran tercatat</p>
+                    <p className="mt-3 text-lg font-bold">Attendance recorded</p>
                     <p className="mt-1 text-sm text-gray-700">
-                      Nama dan waktu Anda telah disimpan.
+                      Your name and check-in time have been saved.
                     </p>
                   </div>
                   <button onClick={reset} className={`${primary} w-full`}>
-                    Selesai
+                    Done
                   </button>
                 </div>
               ) : (
@@ -582,14 +582,14 @@ export default function Page() {
                           className={`font-semibold ${participantClosed ? "text-red-950" : "text-green-950"}`}
                         >
                           {participantClosed
-                            ? "Daftar hadir ini telah ditutup pada"
-                            : "Daftar Hadir akan ditutup pada"}
+                            ? "This attendance list closed on"
+                            : "The attendance list will close on"}
                         </span>{" "}
                         {formattedCloseTime}
                       </div>
                       {!participantClosed && (
                         <label className="block text-sm font-semibold">
-                          Nama Lengkap
+                          Full name
                           <input
                             className={field}
                             value={name}
@@ -613,19 +613,19 @@ export default function Page() {
                         disabled={loading || participantClosed || duplicateName}
                       >
                         {participantClosed
-                          ? "Daftar ditutup"
+                          ? "List closed"
                           : loading
                             ? "Menyimpan…"
                             : duplicateName
-                              ? "Nama Anda sudah ada di dalam daftar"
-                              : "Catat saya hadir"}{" "}
+                              ? "Your name is already on the list"
+                              : "Record my attendance"}{" "}
                         <Check size={17} />
                       </button>
                     </>
                   ) : (
                     <>
                       <label className="block text-sm font-semibold">
-                        ID daftar
+                        List ID
                         <input
                           className={`${field} uppercase tracking-[0.2em]`}
                           maxLength={4}
@@ -638,7 +638,7 @@ export default function Page() {
                         />
                       </label>
                       <label className="block text-sm font-semibold">
-                        Kata sandi daftar
+                        List password
                         <input
                           className={field}
                           type="password"
@@ -651,7 +651,7 @@ export default function Page() {
                         className={`${primary} w-full`}
                         disabled={loading}
                       >
-                        {loading ? "Memeriksa…" : "Lanjutkan"}{" "}
+                        {loading ? "Checking…" : "Continue"}{" "}
                         <ArrowLeft className="rotate-180" size={17} />
                       </button>
                     </>
@@ -670,10 +670,10 @@ export default function Page() {
               <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
                 <div>
                   <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-gray-700">
-                    Dasbor host
+                    Host dashboard
                   </p>
                   <h2 className="text-4xl font-bold tracking-tight">
-                    Semua daftar Anda
+                    All your lists
                   </h2>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -686,14 +686,14 @@ export default function Page() {
                     }}
                     className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-black px-3 text-sm font-semibold text-white hover:bg-gray-800"
                   >
-                    <Plus size={16} /> Buat daftar baru
+                    <Plus size={16} /> Create a new list
                   </button>
                   <button
                     onClick={removeSelected}
                     disabled={!selected.length || loading}
                     className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-700 disabled:opacity-40"
                   >
-                    <Trash2 size={16} /> Hapus terpilih
+                    <Trash2 size={16} /> Delete selected
                   </button>
                 </div>
               </div>
@@ -704,18 +704,18 @@ export default function Page() {
               )}
               {hostLists.length === 0 ? (
                 <div className="rounded-2xl border border-gray-200 bg-white px-5 py-16 text-center text-sm text-gray-500">
-                  Belum ada daftar kehadiran.
+                  No attendance lists yet.
                 </div>
               ) : selectedList ? (
                   <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
                     <div className="mb-5 flex items-start justify-between gap-4">
                       <div>
-                        <p className="text-xs font-bold uppercase tracking-[0.18em] text-gray-500">Detail daftar</p>
+                        <p className="text-xs font-bold uppercase tracking-[0.18em] text-gray-500">List details</p>
                         <h3 className="mt-2 text-2xl font-bold">{selectedList.listName}</h3>
                         <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm text-gray-500">
-                          <span>Kode: <strong className="font-mono text-gray-900">{selectedList.id}</strong></span>
-                          <span>Dibuat: {formatDateTime(selectedList.createdAt)}</span>
-                          <span>{selectedList.participants.length} peserta</span>
+                          <span>Code: <strong className="font-mono text-gray-900">{selectedList.id}</strong></span>
+                          <span>Created: {formatDateTime(selectedList.createdAt)}</span>
+                          <span>{selectedList.participants.length} participants</span>
                         </div>
                       </div>
 <div
@@ -726,18 +726,18 @@ export default function Page() {
                         </div>
                     </div>
                     <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                      <h4 className="font-semibold">Peserta</h4>
+                      <h4 className="font-semibold">Participants</h4>
                       <label className="inline-flex h-9 items-center gap-2 rounded-lg border border-gray-200 px-3 text-sm font-medium">
                         <select
-                          aria-label="Urutkan peserta"
+                          aria-label="Sort participants"
                           value={participantSort[selectedList.id] ?? "oldest"}
                           onChange={(e) => setParticipantSort((current) => ({ ...current, [selectedList.id]: e.target.value as "az" | "za" | "newest" | "oldest" }))}
                           className="bg-transparent outline-none"
                         >
-                          <option value="az">A ke Z</option>
-                          <option value="za">Z ke A</option>
-                          <option value="newest">Terbaru</option>
-                          <option value="oldest">Terlama</option>
+                          <option value="az">A to Z</option>
+                          <option value="za">Z to A</option>
+                          <option value="newest">Newest</option>
+                          <option value="oldest">Oldest</option>
                         </select>
                       </label>
                     </div>
@@ -752,9 +752,9 @@ export default function Page() {
                           <span className="text-xs text-gray-500">{formatDateTime(participant.createdAt)}</span>
                         </div>
                       ))}
-                      {selectedList.participants.length === 0 && <p className="px-4 py-6 text-center text-sm text-gray-500">Belum ada peserta.</p>}
+                      {selectedList.participants.length === 0 && <p className="px-4 py-6 text-center text-sm text-gray-500">No participants yet.</p>}
                     </div>
-                    <button onClick={() => setSelectedList(null)} className="mt-5 text-sm font-semibold text-gray-500 hover:text-black">← Kembali ke semua daftar</button>
+                    <button onClick={() => setSelectedList(null)} className="mt-5 text-sm font-semibold text-gray-500 hover:text-black">← Back to all lists</button>
                   </div>
                 ) : (
                   <div className="grid gap-4 md:grid-cols-2">
@@ -763,14 +763,14 @@ export default function Page() {
                         type="button"
                         onClick={() => openListDetails(list)}
                         key={list.id}
-                        aria-label={`Buka detail daftar ${list.listName}`}
+                        aria-label={`Open details for ${list.listName}`}
                         className="block w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-gray-400 hover:shadow-md"
                       >
                         <div className="flex items-center gap-3">
                           <input
                             type="checkbox"
                             checked={selected.includes(list.id)}
-                            aria-label={`Pilih daftar ${list.listName}`}
+                            aria-label={`Select ${list.listName}`}
                             onClick={(e) => e.stopPropagation()}
                             onChange={(e) => setSelected((current) => e.target.checked ? [...current, list.id] : current.filter((id) => id !== list.id))}
                             className="size-4 shrink-0 accent-black"
@@ -779,14 +779,14 @@ export default function Page() {
                             <div className="flex items-center justify-between gap-3">
                               <span className="truncate text-base font-bold">{list.listName}</span>
                               <span className={`flex shrink-0 items-center gap-1.5 text-xs font-semibold ${Date.now() >= new Date(list.expiresAt).getTime() ? "text-red-700" : "text-green-700"}`}>
-                                {Date.now() >= new Date(list.expiresAt).getTime() ? "Ditutup" : "AKTIF"}
+                                {Date.now() >= new Date(list.expiresAt).getTime() ? "CLOSED" : "ACTIVE"}
                                 <span aria-hidden="true" className={`size-2 rounded-full ${Date.now() >= new Date(list.expiresAt).getTime() ? "bg-red-500" : "bg-green-500"}`} />
                               </span>
                             </div>
                             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
                               <span className="font-mono">{list.id}</span>
                               <span>{formatDateTime(list.createdAt)}</span>
-                              <span className="inline-flex items-center gap-1 font-semibold"><Users size={13} /> {list.participantCount} peserta</span>
+                              <span className="inline-flex items-center gap-1 font-semibold"><Users size={13} /> {list.participantCount} participants</span>
                             </div>
                           </div>
                         </div>
@@ -798,7 +798,7 @@ export default function Page() {
           )}
         </section>
         <footer className="flex items-center justify-center gap-2 pb-2 text-xs text-gray-400">
-          <LockKeyhole size={13} /> Privat dengan kata sandi host
+          <LockKeyhole size={13} /> Private with a host password
         </footer>
       </div>
     </main>
