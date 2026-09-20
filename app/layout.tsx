@@ -7,8 +7,8 @@ export const metadata: Metadata = {
   description: 'Create private attendance lists and let participants check in with a four-character ID.',
   generator: 'v0.app',
   icons: {
-    icon: '/icon.svg',
-    apple: '/icon.svg',
+    icon: '/attendance-list-favicon.png',
+    apple: '/attendance-list-favicon.png',
   },
 }
 
