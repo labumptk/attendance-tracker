@@ -536,21 +536,31 @@ earlier. Did you forget?
                   </div>
                 </>
               )}
-              <div className="mb-8">
-                <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-gray-700">
-                  Participant access
-                </p>
-                <h2 className="text-4xl font-bold tracking-tight">
-                  {participantReady || directJoin
-                    ? participantListName || "Record attendance"
-                    : "Record attendance"}
-                </h2>
-                {!(participantReady || directJoin) && (
-                  <p className="mt-3 text-gray-500">
-                    Enter the information shared by the host.
-                  </p>
-                )}
-              </div>
+  <div className="mb-8">
+  <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-gray-700">
+  Participant access
+  </p>
+  <div className="flex items-center gap-3">
+  <h2 className="text-4xl font-bold tracking-tight">
+  {participantReady || directJoin
+  ? participantListName || "Record Attendance"
+  : "Record Attendance"}
+  </h2>
+  <Image
+  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-dMn7yPabzUeKY3v5i1lErYxsfj2i34-eshualed8coqZh0eEbJjYlMFtgMT8v.png"
+  alt="Attendance list illustration with a pencil"
+  width={44}
+  height={44}
+  className="size-11 rounded-lg object-cover"
+  priority
+  />
+  </div>
+  {!(participantReady || directJoin) && (
+  <p className="mt-3 text-gray-500">
+  Enter the information shared by the host.
+  </p>
+  )}
+  </div>
               {error &&
                 !duplicateName &&
                 ((mode === "join" && participantReady) ||
