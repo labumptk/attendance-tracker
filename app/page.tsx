@@ -554,7 +554,11 @@ earlier. Did you forget?
               {message === "Your attendance has been recorded." ? (
                 <div className="space-y-5">
                   <div className="rounded-2xl border border-gray-200 bg-white p-6 text-center">
-                    <Check className="mx-auto text-gray-700" size={32} />
+                    <img
+                      src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/jump-TwqW1TKuFRMztPmV7w6eHEmsc1s2YJ.png"
+                      alt="Joyful person jumping with both hands raised"
+                      className="mx-auto mb-4 h-48 w-48 rounded-2xl object-cover"
+                    />
                     <p className="mt-3 text-lg font-bold">Attendance recorded</p>
                     <p className="mt-1 text-sm text-gray-700">
                       Your name and check-in time have been saved.
@@ -722,7 +726,7 @@ earlier. Did you forget?
                           className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold ${Date.now() >= new Date(selectedList.expiresAt).getTime() ? "border-gray-200 bg-gray-100 text-gray-700" : "border-green-200 bg-green-50 text-green-800"}`}
                           role="status"
                         >
-                          {Date.now() >= new Date(selectedList.expiresAt).getTime() ? "DITUTUP" : "AKTIF"}
+                          {Date.now() >= new Date(selectedList.expiresAt).getTime() ? "INACTIVE" : "ACTIVE"}
                         </div>
                     </div>
                     <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -779,7 +783,7 @@ earlier. Did you forget?
                             <div className="flex items-center justify-between gap-3">
                               <span className="truncate text-base font-bold">{list.listName}</span>
                               <span className={`flex shrink-0 items-center gap-1.5 text-xs font-semibold ${Date.now() >= new Date(list.expiresAt).getTime() ? "text-red-700" : "text-green-700"}`}>
-                                {Date.now() >= new Date(list.expiresAt).getTime() ? "CLOSED" : "ACTIVE"}
+                                {Date.now() >= new Date(list.expiresAt).getTime() ? "INACTIVE" : "ACTIVE"}
                                 <span aria-hidden="true" className={`size-2 rounded-full ${Date.now() >= new Date(list.expiresAt).getTime() ? "bg-red-500" : "bg-green-500"}`} />
                               </span>
                             </div>
