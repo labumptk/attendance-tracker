@@ -92,8 +92,9 @@ export async function addParticipant(listId: string, password: string, fullName:
   const parsedName = fullNameSchema.safeParse(fullName)
   if (!parsedId.success) return { error: 'List ID must be 4 characters.' }
   if (!parsedName.success) return { error: 'Enter your full name.' }
-  const list = await db.select({ id: attendanceLists.id, expiresAt: attendanceLists.expiresAt }).from(attendanceLists).where(and(eq(attendanceLists.id, parsedId.data), eq(attendanceLists.listPassword, password))).limit(1)
-  if (!list[0]) return { error: 'The list ID or password is incorrect.' }
+  const list = await db.select({ id: attendanceLists.id, expiresAt: attendanceLists.expiresAt, listPassword: attendanceLists.listPassword }).from(attendanceLists).where(eq(attendanceLists.id, parsedId.data)).limit(1)
+  if (!list[0]) return { error: 'That ID was not found in the attendance list.' }
+  if (list[0].listPassword !== password) return { error: 'That password is not correct.' }
   if (list[0].expiresAt.getTime() <= Date.now()) return { error: 'This attendance list is closed.' }
   const existingParticipant = await db.select({ id: attendanceParticipants.id }).from(attendanceParticipants).where(and(eq(attendanceParticipants.listId, parsedId.data), eq(attendanceParticipants.fullName, parsedName.data))).limit(1)
   if (existingParticipant.length > 0) return { error: 'Your name is already on the attendance list.' }

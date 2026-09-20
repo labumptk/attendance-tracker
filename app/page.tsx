@@ -559,10 +559,13 @@ export default function Page() {
                 </div>
               ) : wrongPassword ? (
                 <div className="flex flex-col items-center text-center">
-                  <img
+                  <Image
                     src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/wrong-SlvRL33Op4A9rczzJ5LWZ6uiyuqWdz.png"
                     alt="Red incorrect mark illustration"
-                    className="mb-6 h-48 w-48 rounded-2xl object-cover"
+                    width={192}
+                    height={192}
+                    className="mb-6 size-48 rounded-2xl object-cover"
+                    priority
                   />
                   <p className="text-lg font-semibold leading-7 text-gray-900">
                     Sorry. That password is incorrect.
