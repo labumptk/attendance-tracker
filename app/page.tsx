@@ -300,7 +300,7 @@ export default function Page() {
               onClick={reset}
               className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-black"
             >
-              <ArrowLeft size={16} /> Back
+              {mode === "host" ? "Logout" : <><ArrowLeft size={16} /> Back</>}
             </button>
           )}
         </header>
