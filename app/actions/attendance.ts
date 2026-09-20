@@ -2,7 +2,7 @@
 
 import { cookies, headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
-import { and, asc, desc, eq } from 'drizzle-orm'
+import { and, asc, count, desc, eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '@/lib/db'
 import { attendanceLists, attendanceParticipants } from '@/lib/db/schema'
@@ -45,7 +45,11 @@ export async function getHostLists(password: string) {
   const cookieStore = await cookies()
   cookieStore.set('host-access', 'granted', { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 60 * 60 * 8, path: '/' })
   const lists = await db.select().from(attendanceLists).orderBy(desc(attendanceLists.createdAt))
-  return { lists: lists.map((list) => ({ ...list, participants: [] })) }
+  const listsWithCounts = await Promise.all(lists.map(async (list) => {
+    const [result] = await db.select({ participantCount: count() }).from(attendanceParticipants).where(eq(attendanceParticipants.listId, list.id))
+    return { ...list, participantCount: Number(result?.participantCount ?? 0), participants: [] }
+  }))
+  return { lists: listsWithCounts }
 }
 
 export async function deleteAttendanceParticipant(password: string, listId: string, participantId: string) {
