@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { FormEvent, useEffect, useState } from "react";
 import {
   ArrowLeft,
@@ -370,9 +371,19 @@ export default function Page() {
                 <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-gray-700">
                   New attendance list
                 </p>
-                <h2 className="text-4xl font-bold tracking-tight">
-                  Create a list
-                </h2>
+  <div className="flex items-center gap-3">
+  <h2 className="text-4xl font-bold tracking-tight">
+  Create a list
+  </h2>
+  <Image
+  src="/pen.png"
+  alt="Blue pen"
+  width={44}
+  height={44}
+  className="size-11 rounded-lg object-cover"
+  priority
+  />
+  </div>
               </div>
               {created ? (
                 <div className="space-y-4">
