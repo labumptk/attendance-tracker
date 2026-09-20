@@ -719,14 +719,10 @@ export default function Page() {
                         </div>
                       </div>
 <div
-                          className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold ${Date.now() >= new Date(selectedList.expiresAt).getTime() ? "border-red-200 bg-red-50 text-red-800" : "border-green-200 bg-green-50 text-green-800"}`}
+                          className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold ${Date.now() >= new Date(selectedList.expiresAt).getTime() ? "border-gray-200 bg-gray-100 text-gray-700" : "border-green-200 bg-green-50 text-green-800"}`}
                           role="status"
                         >
-                          <span
-                            aria-hidden="true"
-                            className={`size-2.5 rounded-full ${Date.now() >= new Date(selectedList.expiresAt).getTime() ? "bg-red-500" : "bg-green-500"}`}
-                          />
-                          {Date.now() >= new Date(selectedList.expiresAt).getTime() ? "Daftar ditutup" : "Daftar dibuka"}
+                          {Date.now() >= new Date(selectedList.expiresAt).getTime() ? "DITUTUP" : "Dibuka"}
                         </div>
                     </div>
                     <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
