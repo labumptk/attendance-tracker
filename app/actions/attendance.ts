@@ -94,7 +94,7 @@ export async function addParticipant(listId: string, password: string, fullName:
   const parsedName = fullNameSchema.safeParse(fullName)
   if (!parsedId.success) return { error: 'List ID must be 4 characters.' }
   if (!parsedName.success) return { error: 'Enter your full name.' }
-  const list = await db.select({ id: attendanceLists.id, expiresAt: attendanceLists.expiresAt }).from(attendanceLists).where(and(eq(attendanceLists.id, parsedId.data), eq(attendanceLists.listPassword, password))).limit(1)
+  const list = await db.select({ id: attendanceLists.id, listName: attendanceLists.listName, expiresAt: attendanceLists.expiresAt }).from(attendanceLists).where(and(eq(attendanceLists.id, parsedId.data), eq(attendanceLists.listPassword, password))).limit(1)
   if (!list[0]) return { error: 'List ID atau kata sandi tidak sesuai.' }
   if (list[0].expiresAt.getTime() <= Date.now()) return { error: 'Daftar hadir ini telah ditutup.' }
   const existingParticipant = await db.select({ id: attendanceParticipants.id }).from(attendanceParticipants).where(and(eq(attendanceParticipants.listId, parsedId.data), eq(attendanceParticipants.fullName, parsedName.data))).limit(1)
