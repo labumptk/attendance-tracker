@@ -560,7 +560,16 @@ earlier. Did you forget?
                     className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800"
                     role="alert"
                   >
-                    Your name is already on this attendance list. Please use a different name or exit.
+                    <p>
+                      Your name is already on this attendance list. Please use a different name or exit.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => window.close()}
+                      className="mt-3 font-semibold underline underline-offset-4 transition hover:text-red-950"
+                    >
+                      Exit
+                    </button>
                   </div>
                 )}
               {message === "Your attendance has been recorded." ? (
