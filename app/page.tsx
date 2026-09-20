@@ -716,14 +716,16 @@ export default function Page() {
                     <a
                       href={`/list/${list.id}`}
                       key={list.id}
-                      className="host-list-card [&>button]:hidden [&>label:not(:first-child)]:hidden block rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-gray-400 hover:shadow-md"
+                      aria-label={`Buka detail daftar ${list.listName}`}
+                      className="block rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-gray-400 hover:shadow-md"
                     >
-                      <summary className="cursor-pointer list-none">
+                      <div className="cursor-pointer">
                         <div className="flex items-start justify-between gap-3">
                           <label className="flex items-start gap-3">
                             <input
                               type="checkbox"
                               checked={selected.includes(list.id)}
+                              onClick={(e) => e.stopPropagation()}
                               onChange={(e) =>
                                 setSelected((current) =>
                                   e.target.checked
@@ -746,7 +748,7 @@ export default function Page() {
                             </span>
                           </label>
                         </div>
-                      </summary>
+                      </div>
                       <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
                         <div className="flex items-center gap-2 font-semibold text-gray-600">
                           <Users size={16} /> {list.participantCount} peserta
