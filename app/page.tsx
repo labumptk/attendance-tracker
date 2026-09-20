@@ -25,8 +25,16 @@ export default function Page() {
   async function handleCreate(e: FormEvent<HTMLFormElement>) { e.preventDefault(); const normalizedName = listName.trim().toUpperCase(); if (!/^\d{4}$/.test(password)) { setMessage('Kata sandi daftar harus terdiri dari 4 digit angka.'); return } setLoading(true); setMessage(''); const result = await createAttendanceList(normalizedName, password, masterPassword); setLoading(false); if ('error' in result) setMessage(result.error); else { setCreated({ id: result.id, name: listName.trim() }); setExpiresAt(result.expiresAt.toISOString()); setShareLink(`${window.location.origin}?list=${result.id}&name=${encodeURIComponent(normalizedName)}&password=${encodeURIComponent(password)}&expiresAt=${encodeURIComponent(result.expiresAt.toISOString())}`); setListId(result.id); setPassword(''); setMessage('Daftar dibuat. Tautan peserta siap dibagikan.') } }
   async function handleJoin(e: FormEvent<HTMLFormElement>) { e.preventDefault(); setLoading(true); setMessage(''); const result = await getAttendanceList(listId, password, 'participant'); setLoading(false); if ('error' in result) setMessage(result.error); else { setExpiresAt(result.expiresAt.toISOString()); setParticipantListName(result.listName); setDuplicateIp(result.duplicateIp); setParticipantReady(true); setMessage('') } }
   async function handleHost(e: FormEvent<HTMLFormElement>) { e.preventDefault(); setLoading(true); setMessage(''); const result = await getHostLists(password); setLoading(false); if ('error' in result) setMessage(result.error); else { setHostLists(result.lists); setMode('host') } }
-  async function loadParticipants(listId: string) { const list = hostLists.find((item) => item.id === listId); if (!list || list.participants.length) return list?.participants || []; const result = await getHostParticipants(password, listId); if (!('error' in result)) { setHostLists((lists) => lists.map((item) => item.id === listId ? { ...item, participants: result.participants } : item)); return result.participants } return [] }
-  async function openHostList(list: HostList) { setSelectedHostList({ ...list, participants: await loadParticipants(list.id) }); setMode('host-detail') }
+  useEffect(() => {
+    if (mode !== 'host-detail' || !selectedHostList || selectedHostList.participants.length) return
+    let cancelled = false
+    void getHostParticipants(password, selectedHostList.id).then((result) => {
+      if (!cancelled && !('error' in result)) setSelectedHostList((current) => current ? { ...current, participants: result.participants } : current)
+    })
+    return () => { cancelled = true }
+  }, [mode, password, selectedHostList?.id])
+
+  function openHostList(list: HostList) { setSelectedHostList({ ...list, participants: [] }); setMode('host-detail') }
   async function handleAttendance(e: FormEvent<HTMLFormElement>) { e.preventDefault(); setLoading(true); setMessage(''); const result = await addParticipant(listId, password, name); setLoading(false); if ('error' in result) setMessage(result.error); else { setName(''); setMessage('Kehadiran Anda telah dicatat.') } }
   async function copyText(text: string) { await navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 1500) }
   async function removeSelected() { if (!confirm('Hapus daftar yang dipilih beserta seluruh pesertanya?')) return; setLoading(true); const result = await deleteAttendanceLists(password, selected); setLoading(false); if ('error' in result) setMessage(result.error); else { setHostLists((lists) => lists.filter((list) => !selected.includes(list.id))); setSelected([]); setMessage('Daftar terpilih telah dihapus.') } }
