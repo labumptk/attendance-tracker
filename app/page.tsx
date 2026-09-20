@@ -426,6 +426,17 @@ export default function Page() {
               ) : (
                 <form onSubmit={handleCreate} className="space-y-5">
                   <label className="block text-sm font-semibold">
+                    List password
+                    <input
+                      className={field}
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      minLength={4}
+                      required
+                    />
+                  </label>
+                  <label className="block text-sm font-semibold">
                     List name
                     <input
                       className={field}
@@ -446,17 +457,6 @@ export default function Page() {
                       value={masterPassword}
                       onChange={(e) => setMasterPassword(e.target.value)}
                       placeholder="Enter the host password"
-                      required
-                    />
-                  </label>
-                  <label className="block text-sm font-semibold">
-                    List password
-                    <input
-                      className={field}
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      minLength={4}
                       required
                     />
                   </label>
