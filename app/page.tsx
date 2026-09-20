@@ -59,7 +59,8 @@ export default function Page() {
   const [message, setMessage] = useState(""),
     [loading, setLoading] = useState(false),
     [copied, setCopied] = useState(false),
-    [unknownList, setUnknownList] = useState(false);
+    [unknownList, setUnknownList] = useState(false),
+    [wrongPassword, setWrongPassword] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search),
@@ -128,6 +129,7 @@ export default function Page() {
     setLoading(true);
     setMessage("");
     setUnknownList(false);
+    setWrongPassword(false);
     const result = await getAttendanceList(listId, password, "participant");
     setLoading(false);
     if ("error" in result) {
@@ -173,7 +175,10 @@ export default function Page() {
     setMessage("");
     const result = await addParticipant(listId, password, name);
     setLoading(false);
-    if ("error" in result) setMessage(result.error);
+    if ("error" in result) {
+      setWrongPassword(result.error === "That password is not correct.");
+      setMessage(result.error);
+    }
     else {
       setName("");
       setMessage("Your attendance has been recorded.");
@@ -549,6 +554,28 @@ export default function Page() {
                     className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-gray-700 underline underline-offset-4 transition hover:text-black"
                   >
                     <ArrowLeft size={16} aria-hidden="true" />
+                    Try again?
+                  </button>
+                </div>
+              ) : wrongPassword ? (
+                <div className="flex flex-col items-center text-center">
+                  <img
+                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/wrong-SlvRL33Op4A9rczzJ5LWZ6uiyuqWdz.png"
+                    alt="Red incorrect mark illustration"
+                    className="mb-6 h-48 w-48 rounded-2xl object-cover"
+                  />
+                  <p className="text-lg font-semibold leading-7 text-gray-900">
+                    Sorry. That password is incorrect.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setWrongPassword(false);
+                      setMessage("");
+                      setPassword("");
+                    }}
+                    className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-gray-700 underline underline-offset-4 transition hover:text-black"
+                  >
                     Try again?
                   </button>
                 </div>
