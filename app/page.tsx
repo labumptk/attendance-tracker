@@ -252,7 +252,9 @@ export default function Page() {
   const participantClosed = Boolean(
     expiresAt && Date.now() >= new Date(expiresAt).getTime(),
   );
-  const duplicateName = message.toLowerCase().includes("sudah ada");
+  const duplicateName =
+    message.toLowerCase().includes("sudah ada") ||
+    message.toLowerCase().includes("already on the attendance list");
   const formatDateTime = (value: Date | string) =>
     new Intl.DateTimeFormat("en-GB", {
       timeZone: "Asia/Jakarta",
@@ -549,6 +551,16 @@ earlier. Did you forget?
                     role="alert"
                   >
                     {error}
+                  </div>
+                )}
+              {duplicateName &&
+                ((mode === "join" && participantReady) ||
+                  (mode === "join" && directJoin)) && (
+                  <div
+                    className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800"
+                    role="alert"
+                  >
+                    Your name is already on this attendance list. Please use a different name or exit.
                   </div>
                 )}
               {message === "Your attendance has been recorded." ? (
