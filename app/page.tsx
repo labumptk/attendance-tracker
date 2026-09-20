@@ -58,7 +58,8 @@ export default function Page() {
     [expiresAt, setExpiresAt] = useState("");
   const [message, setMessage] = useState(""),
     [loading, setLoading] = useState(false),
-    [copied, setCopied] = useState(false);
+    [copied, setCopied] = useState(false),
+    [unknownList, setUnknownList] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search),
@@ -126,9 +127,13 @@ export default function Page() {
     e.preventDefault();
     setLoading(true);
     setMessage("");
+    setUnknownList(false);
     const result = await getAttendanceList(listId, password, "participant");
     setLoading(false);
-    if ("error" in result) setMessage(result.error);
+    if ("error" in result) {
+      setUnknownList(result.error === "That ID was not found in the attendance list.");
+      setMessage(result.error);
+    }
     else {
       setExpiresAt(result.expiresAt.toISOString());
       setParticipantListName(result.listName);
@@ -518,8 +523,37 @@ export default function Page() {
           )}
           {mode === "join" && (
             <div
-              className={`w-full max-w-md ${duplicateIp ? "[&>*:nth-child(n+3)]:hidden" : ""}`}
+              className={`w-full max-w-md ${unknownList ? "" : duplicateIp ? "[&>*:nth-child(n+3)]:hidden" : ""}`}
             >
+              {unknownList ? (
+                <div className="flex flex-col items-center text-center">
+                  <Image
+                    src="/empty.png"
+                    alt="Question mark and magnifying glass illustration"
+                    width={220}
+                    height={220}
+                    className="mb-6 size-44 rounded-2xl object-cover sm:size-52"
+                    priority
+                  />
+                  <p className="max-w-sm text-lg font-semibold leading-7 text-gray-900">
+                    There is no such ID in our database. Would you like to try again?
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUnknownList(false);
+                      setMessage("");
+                      setListId("");
+                      setPassword("");
+                    }}
+                    className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-gray-700 underline underline-offset-4 transition hover:text-black"
+                  >
+                    <ArrowLeft size={16} aria-hidden="true" />
+                    Try again?
+                  </button>
+                </div>
+              ) : (
+              <>
               {duplicateIp && (
                 <>
                   <img
@@ -715,6 +749,8 @@ earlier. Did you forget?
                 >
                   Exit
                 </button>
+              )}
+              </>
               )}
             </div>
           )}
