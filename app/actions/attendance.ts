@@ -2,7 +2,7 @@
 
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
-import { and, asc, eq } from 'drizzle-orm'
+import { and, asc, desc, eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '@/lib/db'
 import { attendanceLists, attendanceParticipants } from '@/lib/db/schema'
@@ -42,12 +42,16 @@ export async function createAttendanceList(listName: string, listPassword: strin
 
 export async function getHostLists(password: string) {
   if (password !== creatorPassword) return { error: 'Kata sandi host tidak sesuai.' }
-  const lists = await db.select().from(attendanceLists).orderBy(asc(attendanceLists.createdAt))
-  const results = await Promise.all(lists.map(async (list) => ({
-    ...list,
-    participants: await db.select().from(attendanceParticipants).where(eq(attendanceParticipants.listId, list.id)).orderBy(asc(attendanceParticipants.createdAt)),
-  })))
-  return { lists: results }
+  const lists = await db.select().from(attendanceLists).orderBy(desc(attendanceLists.createdAt))
+  return { lists: lists.map((list) => ({ ...list, participants: [] })) }
+}
+
+export async function getHostParticipants(password: string, listId: string) {
+  if (password !== creatorPassword) return { error: 'Kata sandi host tidak sesuai.' }
+  const parsedListId = listIdSchema.safeParse(listId)
+  if (!parsedListId.success) return { error: 'ID daftar tidak valid.' }
+  const participants = await db.select().from(attendanceParticipants).where(eq(attendanceParticipants.listId, parsedListId.data)).orderBy(asc(attendanceParticipants.createdAt))
+  return { participants }
 }
 
 export async function deleteAttendanceParticipant(password: string, listId: string, participantId: string) {
