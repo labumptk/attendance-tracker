@@ -40,6 +40,7 @@ export default function Page() {
     [participantListName, setParticipantListName] = useState(""),
     [password, setPassword] = useState(""),
     [masterPassword, setMasterPassword] = useState(""),
+    [durationMinutes, setDurationMinutes] = useState("150"),
     [name, setName] = useState("");
   const [created, setCreated] = useState<{ id: string; name: string } | null>(
     null,
@@ -86,6 +87,7 @@ export default function Page() {
     setParticipantListName("");
     setPassword("");
     setMasterPassword("");
+    setDurationMinutes("150");
     setName("");
     setCreated(null);
     setHostLists([]);
@@ -101,6 +103,11 @@ export default function Page() {
   async function handleCreate(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const normalizedName = listName.trim().toUpperCase();
+    const parsedDuration = Number.parseInt(durationMinutes, 10);
+    if (!Number.isInteger(parsedDuration) || parsedDuration < 1 || parsedDuration > 1440) {
+      setMessage("Active duration must be between 1 and 1440 minutes.");
+      return;
+    }
     if (!/^\d{4}$/.test(password)) {
       setMessage("The list password must contain 4 digits.");
       return;
@@ -111,14 +118,15 @@ export default function Page() {
       normalizedName,
       password,
       masterPassword,
+      parsedDuration,
     );
     setLoading(false);
-    if ("error" in result) setMessage(result.error);
+    if ("error" in result) setMessage(result.error ?? "Something went wrong.");
     else {
       setCreated({ id: result.id, name: listName.trim() });
-      setExpiresAt(result.expiresAt.toISOString());
+      setExpiresAt(result.expiresAt?.toISOString() ?? "");
       setShareLink(
-        `${window.location.origin}?list=${result.id}&name=${encodeURIComponent(normalizedName)}&password=${encodeURIComponent(password)}&expiresAt=${encodeURIComponent(result.expiresAt.toISOString())}`,
+        `${window.location.origin}?list=${result.id}&name=${encodeURIComponent(normalizedName)}&password=${encodeURIComponent(password)}&expiresAt=${encodeURIComponent(result.expiresAt?.toISOString() ?? "")}`,
       );
       setListId(result.id);
       setPassword("");
@@ -136,10 +144,10 @@ export default function Page() {
     if ("error" in result) {
       setUnknownList(result.error === "That ID was not found in the attendance list.");
       setWrongPassword(result.error === "That password is not correct.");
-      setMessage(result.error);
+      setMessage(result.error ?? "Something went wrong.");
     }
     else {
-      setExpiresAt(result.expiresAt.toISOString());
+      setExpiresAt(result.expiresAt?.toISOString() ?? "");
       setParticipantListName(result.listName);
       setDuplicateIp(result.duplicateIp);
       setParticipantReady(true);
@@ -152,7 +160,7 @@ export default function Page() {
     setMessage("");
     const result = await getHostLists(password);
     setLoading(false);
-    if ("error" in result) setMessage(result.error);
+    if ("error" in result) setMessage(result.error ?? "Something went wrong.");
     else {
       setHostLists(result.lists);
       setListOrder("newest");
@@ -165,7 +173,7 @@ export default function Page() {
     const result = await getAttendanceList(list.id, password, "host");
     setLoading(false);
     if ("error" in result) {
-      setMessage(result.error);
+      setMessage(result.error ?? "Something went wrong.");
       return;
     }
     setSelectedList({ ...list, participants: result.participants });
@@ -179,7 +187,7 @@ export default function Page() {
     setLoading(false);
     if ("error" in result) {
       setWrongPassword(result.error === "That password is not correct.");
-      setMessage(result.error);
+      setMessage(result.error ?? "Something went wrong.");
     }
     else {
       setName("");
@@ -197,7 +205,7 @@ export default function Page() {
     setLoading(true);
     const result = await deleteAttendanceLists(password, selected);
     setLoading(false);
-    if ("error" in result) setMessage(result.error);
+    if ("error" in result) setMessage(result.error ?? "Something went wrong.");
     else {
       setHostLists((lists) =>
         lists.filter((list) => !selected.includes(list.id)),
@@ -215,7 +223,7 @@ export default function Page() {
       participantId,
     );
     setLoading(false);
-    if ("error" in result) setMessage(result.error);
+    if ("error" in result) setMessage(result.error ?? "Something went wrong.");
     else {
       setHostLists((lists) =>
         lists.map((list) =>
@@ -280,7 +288,7 @@ export default function Page() {
     }).format(new Date(value));
   const formattedCloseTime = expiresAt
     ? formatDateTime(expiresAt)
-    : "2.5 hours after the list is created";
+    : "The list stays active for the duration you set.";
 
   return (
     <main className="min-h-screen bg-[#f8f9fa] text-black">
@@ -468,6 +476,18 @@ export default function Page() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       minLength={4}
+                      required
+                    />
+                  </label>
+                  <label className="block text-sm font-semibold">
+                    Active duration (minutes)
+                    <input
+                      className={field}
+                      type="number"
+                      min={1}
+                      max={1440}
+                      value={durationMinutes}
+                      onChange={(e) => setDurationMinutes(e.target.value)}
                       required
                     />
                   </label>

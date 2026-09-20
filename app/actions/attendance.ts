@@ -12,26 +12,29 @@ const listNameSchema = z.string().trim().min(1).max(8)
 const listPasswordSchema = z.string().regex(/^\d{4}$/, 'The list password must contain 4 digits.')
 const listIdSchema = z.string().trim().toUpperCase().regex(/^[A-Z0-9]{4}$/)
 const fullNameSchema = z.string().trim().min(2).max(32)
-const attendanceWindowMs = 2.5 * 60 * 60 * 1000
+const defaultDurationMinutes = 150
+const durationMinutesSchema = z.coerce.number().int().min(1).max(1440)
 
 function makeListId() {
   const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
   return Array.from({ length: 4 }, () => alphabet[Math.floor(Math.random() * alphabet.length)]).join('')
 }
 
-export async function createAttendanceList(listName: string, listPassword: string, hostPassword: string) {
+export async function createAttendanceList(listName: string, listPassword: string, hostPassword: string, durationMinutes = defaultDurationMinutes) {
   if (hostPassword !== creatorPassword) return { error: 'The host password is incorrect.' }
   const parsedName = listNameSchema.safeParse(listName)
   const parsedPassword = listPasswordSchema.safeParse(listPassword)
+  const parsedDuration = durationMinutesSchema.safeParse(durationMinutes)
   if (!parsedName.success) return { error: 'List name is required and must be 8 characters or fewer.' }
   if (!parsedPassword.success) return { error: 'The list password must be between 4 and 64 characters.' }
+  if (!parsedDuration.success) return { error: 'Active duration must be between 1 and 1440 minutes.' }
 
   for (let attempt = 0; attempt < 5; attempt += 1) {
     const id = makeListId()
     const existing = await db.select({ id: attendanceLists.id }).from(attendanceLists).where(eq(attendanceLists.id, id)).limit(1)
     if (existing.length === 0) {
       const createdAt = new Date()
-      const expiresAt = new Date(createdAt.getTime() + attendanceWindowMs)
+      const expiresAt = new Date(createdAt.getTime() + parsedDuration.data * 60 * 1000)
       await db.insert(attendanceLists).values({ id, listName: parsedName.data, creatorPassword, listPassword: parsedPassword.data, createdAt, expiresAt })
       return { id, expiresAt }
     }
