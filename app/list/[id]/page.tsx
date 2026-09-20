@@ -6,6 +6,9 @@ import { ArrowLeft, LockKeyhole } from 'lucide-react'
 import { db } from '@/lib/db'
 import { attendanceLists, attendanceParticipants } from '@/lib/db/schema'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function ListDetailsPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ order?: string }> }) {
   const access = (await cookies()).get('host-access')?.value
   if (access !== 'granted') redirect('/')
