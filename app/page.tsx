@@ -667,6 +667,15 @@ earlier. Did you forget?
                   {message}
                 </p>
               )}
+              {duplicateName && (
+                <button
+                  type="button"
+                  onClick={() => window.close()}
+                  className="mx-auto mt-4 block text-sm font-semibold text-gray-600 underline underline-offset-4 transition hover:text-black"
+                >
+                  Exit
+                </button>
+              )}
             </div>
           )}
           {mode === "host" && (
