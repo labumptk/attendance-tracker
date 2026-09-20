@@ -898,9 +898,8 @@ earlier. Did you forget?
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between gap-3">
                               <span className="truncate text-base font-bold">{list.listName}</span>
-                              <span className={`flex shrink-0 items-center gap-1.5 text-xs font-semibold ${Date.now() >= new Date(list.expiresAt).getTime() ? "text-red-700" : "text-green-700"}`}>
+                              <span className="flex shrink-0 items-center rounded-full border border-gray-200 bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-700">
                                 {Date.now() >= new Date(list.expiresAt).getTime() ? "INACTIVE" : "ACTIVE"}
-                                <span aria-hidden="true" className={`size-2 rounded-full ${Date.now() >= new Date(list.expiresAt).getTime() ? "bg-red-500" : "bg-green-500"}`} />
                               </span>
                             </div>
                             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
