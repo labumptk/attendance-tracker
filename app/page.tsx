@@ -722,7 +722,7 @@ export default function Page() {
                           className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold ${Date.now() >= new Date(selectedList.expiresAt).getTime() ? "border-gray-200 bg-gray-100 text-gray-700" : "border-green-200 bg-green-50 text-green-800"}`}
                           role="status"
                         >
-                          {Date.now() >= new Date(selectedList.expiresAt).getTime() ? "DITUTUP" : "Dibuka"}
+                          {Date.now() >= new Date(selectedList.expiresAt).getTime() ? "DITUTUP" : "AKTIF"}
                         </div>
                     </div>
                     <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
