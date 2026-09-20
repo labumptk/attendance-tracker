@@ -695,30 +695,6 @@ export default function Page() {
                   >
                     <Trash2 size={16} /> Hapus terpilih
                   </button>
-                  <label className="inline-flex h-10 items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-700">
-                    Urutkan
-                    <select
-                      aria-label="Urutkan daftar"
-                      value={listOrder}
-                      onChange={(e) => {
-                        const order = e.target.value as "newest" | "oldest";
-                        setListOrder(order);
-                        setHostLists((lists) =>
-                          [...lists].sort((a, b) =>
-                            order === "newest"
-                              ? new Date(b.createdAt).getTime() -
-                                new Date(a.createdAt).getTime()
-                              : new Date(a.createdAt).getTime() -
-                                new Date(b.createdAt).getTime(),
-                          ),
-                        );
-                      }}
-                      className="bg-transparent outline-none"
-                    >
-                      <option value="newest">Terbaru</option>
-                      <option value="oldest">Terlama</option>
-                    </select>
-                  </label>
                 </div>
               </div>
               {message && (
