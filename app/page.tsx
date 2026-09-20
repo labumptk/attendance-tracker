@@ -726,7 +726,6 @@ export default function Page() {
                     <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                       <h4 className="font-semibold">Peserta</h4>
                       <label className="inline-flex h-9 items-center gap-2 rounded-lg border border-gray-200 px-3 text-sm font-medium">
-                        Urutkan
                         <select
                           aria-label="Urutkan peserta"
                           value={participantSort[selectedList.id] ?? "oldest"}
