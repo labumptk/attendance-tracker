@@ -86,7 +86,7 @@ export async function getAttendanceList(listId: string, password: string, mode: 
   const requestHeaders = await headers()
   const ipAddress = requestHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() || requestHeaders.get('x-real-ip') || 'unknown'
   const existingIp = await db.select({ id: attendanceParticipants.id }).from(attendanceParticipants).where(and(eq(attendanceParticipants.listId, parsedId.data), eq(attendanceParticipants.ipAddress, ipAddress))).limit(1)
-  return { listId: list[0].id, listName: list[0].listName, expiresAt: list[0].expiresAt, participants, duplicateIp: existingIp.length > 0 }
+  return { listId: list[0].id, listName: list[0].listName, createdAt: list[0].createdAt, expiresAt: list[0].expiresAt, participants, duplicateIp: existingIp.length > 0 }
 }
 
 export async function addParticipant(listId: string, password: string, fullName: string) {
