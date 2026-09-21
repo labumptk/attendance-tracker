@@ -64,7 +64,9 @@ export default function Page() {
     [duplicateIp, setDuplicateIp] = useState(false),
     [directJoin, setDirectJoin] = useState(false),
     [shareLink, setShareLink] = useState(""),
-    [expiresAt, setExpiresAt] = useState("");
+    [expiresAt, setExpiresAt] = useState(""),
+    [participantStartAt, setParticipantStartAt] = useState(""),
+    [participantClosedAt, setParticipantClosedAt] = useState("");
   const [message, setMessage] = useState(""),
     [loading, setLoading] = useState(false),
     [copied, setCopied] = useState(false),
@@ -76,12 +78,17 @@ export default function Page() {
       id = params.get("list")?.toUpperCase(),
       sharedPassword = params.get("password"),
       sharedExpiresAt = params.get("expiresAt"),
+      sharedStartAt = params.get("startAt"),
       sharedListName = params.get("name");
     if (id && sharedPassword) {
       setListId(id);
       setPassword(sharedPassword);
       setParticipantListName(sharedListName || "");
+      setParticipantStartAt(sharedStartAt || "");
       setExpiresAt(sharedExpiresAt || "");
+      if (sharedStartAt && sharedExpiresAt && (Date.now() < new Date(sharedStartAt).getTime() || Date.now() >= new Date(sharedExpiresAt).getTime())) {
+        setParticipantClosedAt(sharedExpiresAt);
+      }
       setDirectJoin(true);
       setMode("join");
     }
@@ -107,6 +114,8 @@ export default function Page() {
     setDuplicateIp(false);
     setDirectJoin(false);
     setShareLink("");
+    setParticipantStartAt("");
+    setParticipantClosedAt("");
     setMessage("");
   }
   async function handleCreate(e: FormEvent<HTMLFormElement>) {
@@ -136,7 +145,7 @@ export default function Page() {
       setCreated({ id: result.id, name: listName.trim() });
       setExpiresAt(result.expiresAt?.toISOString() ?? "");
       setShareLink(
-        `${window.location.origin}?list=${result.id}&name=${encodeURIComponent(normalizedName)}&password=${encodeURIComponent(password)}&expiresAt=${encodeURIComponent(result.expiresAt?.toISOString() ?? "")}`,
+        `${window.location.origin}?list=${result.id}&name=${encodeURIComponent(normalizedName)}&password=${encodeURIComponent(password)}&startAt=${encodeURIComponent(result.startAt?.toISOString() ?? "")}&expiresAt=${encodeURIComponent(result.expiresAt?.toISOString() ?? "")}`,
       );
       setListId(result.id);
       setPassword("");
@@ -157,7 +166,15 @@ export default function Page() {
       setMessage(result.error ?? "Something went wrong.");
     }
     else {
-      setExpiresAt(result.expiresAt?.toISOString() ?? "");
+      const resultStartAt = result.startAt?.toISOString() ?? "";
+      const resultExpiresAt = result.expiresAt?.toISOString() ?? "";
+      setParticipantStartAt(resultStartAt);
+      setExpiresAt(resultExpiresAt);
+      if (Date.now() < new Date(resultStartAt).getTime() || Date.now() >= new Date(resultExpiresAt).getTime()) {
+        setParticipantClosedAt(resultExpiresAt);
+      } else {
+        setParticipantClosedAt("");
+      }
       setParticipantListName(result.listName);
       setDuplicateIp(result.duplicateIp);
       setParticipantReady(true);
@@ -280,9 +297,7 @@ export default function Page() {
     message !== "Your attendance has been recorded." &&
     message !== "List created. The participant link is ready to share." &&
     message !== "Selected lists have been deleted.";
-  const participantClosed = Boolean(
-    expiresAt && Date.now() >= new Date(expiresAt).getTime(),
-  );
+  const participantClosed = Boolean(participantClosedAt);
   const duplicateName =
     message.toLowerCase().includes("sudah ada") ||
     message.toLowerCase().includes("already on the attendance list");
@@ -410,7 +425,21 @@ export default function Page() {
             <div
               className={`w-full max-w-md ${unknownList ? "" : duplicateIp ? "[&>*:nth-child(n+3)]:hidden" : ""}`}
             >
-              {unknownList ? (
+              {participantClosed ? (
+                <div className="flex flex-col items-center text-center">
+                  <p className="max-w-sm text-lg font-semibold leading-7 text-gray-900">
+                    Sorry. The list is closed at {formatDateTime(participantClosedAt)}.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => window.close()}
+                    className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-gray-700 underline underline-offset-4 transition hover:text-black"
+                  >
+                    <ArrowLeft size={16} aria-hidden="true" />
+                    Exit
+                  </button>
+                </div>
+              ) : unknownList ? (
                 <div className="flex flex-col items-center text-center">
                   <Image
                     src="/empty.png"
