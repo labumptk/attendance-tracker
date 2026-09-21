@@ -427,9 +427,12 @@ export default function Page() {
             >
               {participantClosed ? (
                 <div className="flex flex-col items-center text-center">
-                  <p className="max-w-sm text-lg font-semibold leading-7 text-gray-900">
-                    Sorry. The list is closed at {formatDateTime(participantClosedAt)}.
-                  </p>
+                  <div
+                    className="w-full rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800"
+                    role="alert"
+                  >
+                    Sorry. The list is closed.
+                  </div>
                   <button
                     type="button"
                     onClick={() => window.close()}
