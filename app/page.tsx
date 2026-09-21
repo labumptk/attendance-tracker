@@ -8,6 +8,7 @@ import {
   Clipboard,
   ListChecks,
   LockKeyhole,
+  LogIn,
   LogOut,
   Plus,
   Trash2,
@@ -328,7 +329,18 @@ export default function Page() {
             </span>
             <span className="text-lg font-bold tracking-tight">Hadir</span>
           </button>
-          {mode !== "home" && (
+          {mode === "home" ? (
+            <button
+              onClick={() => {
+                setMode("host-access");
+                setMessage("");
+              }}
+              className="flex items-center gap-2 text-sm font-semibold text-gray-600 transition hover:text-black"
+            >
+              <LogIn size={16} aria-hidden="true" />
+              Log In
+            </button>
+          ) : (
             <button
               onClick={reset}
               className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-black"
@@ -349,26 +361,6 @@ export default function Page() {
                 </p>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
-                <button
-                  onClick={() => {
-                    setMode("host-access");
-                    setMessage("");
-                  }}
-                  className="order-3 rounded-2xl border border-gray-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-1 hover:border-gray-400 hover:shadow-xl"
-                >
-                  <span className="mb-4 flex h-9 w-9 items-center justify-center rounded-lg bg-[#f8f9fa] text-gray-700">
-                    <LockKeyhole size={18} />
-                  </span>
-                  <span className="block text-base font-bold">
-                    Manage lists
-                  </span>
-                  <span className="mt-1 block text-xs leading-5 text-gray-500">
-                    Manage all lists with one host password.
-                  </span>
-                  <span className="mt-4 block text-xs font-semibold text-gray-700">
-                    Open host dashboard →
-                  </span>
-                </button>
                 <button
                   onClick={() => {
                     setMode("join");
