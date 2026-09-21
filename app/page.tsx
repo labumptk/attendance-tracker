@@ -831,10 +831,10 @@ earlier. Did you forget?
                         </div>
                       </div>
 <div
-                          className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold ${Date.now() >= new Date(selectedList.expiresAt).getTime() ? "border-gray-200 bg-gray-100 text-gray-700" : "border-green-200 bg-green-50 text-green-800"}`}
+                          className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold ${Date.now() >= new Date(selectedList.expiresAt).getTime() ? "border-gray-200 bg-gray-100 text-gray-700" : selectedList.participants.length === 0 ? "border-blue-200 bg-blue-50 text-blue-800" : "border-green-200 bg-green-50 text-green-800"}`}
                           role="status"
                         >
-                          {Date.now() >= new Date(selectedList.expiresAt).getTime() ? "INACTIVE" : "ACTIVE"}
+                          {Date.now() >= new Date(selectedList.expiresAt).getTime() ? "INACTIVE" : selectedList.participants.length === 0 ? "SCHEDULED" : "ACTIVE"}
                         </div>
                     </div>
                     <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -890,8 +890,8 @@ earlier. Did you forget?
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between gap-3">
                               <span className="truncate text-base font-bold">{list.listName}</span>
-<span className={`flex shrink-0 items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${Date.now() >= new Date(list.expiresAt).getTime() ? "border-gray-200 bg-gray-100 text-gray-700" : "border-green-200 bg-green-50 text-green-800"}`}>
-    {Date.now() >= new Date(list.expiresAt).getTime() ? "INACTIVE" : "ACTIVE"}
+<span className={`flex shrink-0 items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${Date.now() >= new Date(list.expiresAt).getTime() ? "border-gray-200 bg-gray-100 text-gray-700" : list.participantCount === 0 ? "border-blue-200 bg-blue-50 text-blue-800" : "border-green-200 bg-green-50 text-green-800"}`}>
+    {Date.now() >= new Date(list.expiresAt).getTime() ? "INACTIVE" : list.participantCount === 0 ? "SCHEDULED" : "ACTIVE"}
   </span>
                             </div>
                             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
