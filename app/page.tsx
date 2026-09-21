@@ -121,6 +121,18 @@ export default function Page() {
       setMessage(result.error ?? "Something went wrong.");
       return;
     }
+    const now = new Date();
+    const today = [
+      now.getFullYear(),
+      String(now.getMonth() + 1).padStart(2, "0"),
+      String(now.getDate()).padStart(2, "0"),
+    ].join("-");
+    const currentTime = [
+      String(now.getHours()).padStart(2, "0"),
+      String(now.getMinutes()).padStart(2, "0"),
+    ].join(":");
+    setStartDate(today);
+    setStartTime(currentTime);
     setCreateStep("details");
   }
   async function handleCreate(e: FormEvent<HTMLFormElement>) {
@@ -679,6 +691,74 @@ earlier. Did you forget?
               )}
             </div>
           )}
+          {mode === "create" && (
+            <div className="w-full max-w-md">
+              {created ? (
+                <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                  <p className="mb-2 text-sm font-bold uppercase tracking-[0.18em] text-gray-700">
+                    List created
+                  </p>
+                  <h2 className="text-3xl font-bold tracking-tight">{created.name}</h2>
+                  <p className="mt-3 text-sm text-gray-500">
+                    Share this link with participants so they can record attendance.
+                  </p>
+                  <div className="mt-5 flex flex-col gap-3">
+                    <input className={field} value={shareLink} readOnly aria-label="Participant share link" />
+                    <button type="button" onClick={() => copyText(shareLink)} className={primary}>
+                      {copied ? "Copied" : "Copy participant link"} <Clipboard size={17} />
+                    </button>
+                    <button type="button" onClick={() => setMode("host")} className="h-12 rounded-xl border border-gray-200 text-sm font-semibold hover:border-gray-400">
+                      Back to dashboard
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="mb-8">
+                    <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-gray-700">
+                      Host dashboard
+                    </p>
+                    <h2 className="text-4xl font-bold tracking-tight">Create a new list</h2>
+                    <p className="mt-3 text-gray-500">
+                      Set the list details and the time window for attendance.
+                    </p>
+                  </div>
+                  <form onSubmit={handleCreate} className="flex flex-col gap-5">
+                    <label className="block text-sm font-semibold">
+                      List name
+                      <input className={field} value={listName} onChange={(e) => setListName(e.target.value.toUpperCase().slice(0, 8))} maxLength={8} required autoFocus />
+                    </label>
+                    <label className="block text-sm font-semibold">
+                      List password
+                      <input className={field} type="password" inputMode="numeric" value={password} onChange={(e) => setPassword(e.target.value.replace(/\\D/g, "").slice(0, 4))} maxLength={4} required />
+                    </label>
+                    <div className="grid gap-5 sm:grid-cols-2">
+                      <label className="block text-sm font-semibold">
+                        Start date
+                        <input className={field} type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required />
+                      </label>
+                      <label className="block text-sm font-semibold">
+                        Start time
+                        <input className={field} type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} required />
+                      </label>
+                      <label className="block text-sm font-semibold">
+                        End date
+                        <input className={field} type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} required />
+                      </label>
+                      <label className="block text-sm font-semibold">
+                        End time
+                        <input className={field} type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} required />
+                      </label>
+                    </div>
+                    <button className={primary} disabled={loading}>
+                      {loading ? "Creating…" : "Create list"} <Plus size={17} />
+                    </button>
+                  </form>
+                  {message && <p className="mt-4 text-sm font-medium text-red-600" role="alert">{message}</p>}
+                </>
+              )}
+            </div>
+          )}
           {mode === "host" && (
             <div className="w-full max-w-4xl">
               <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
@@ -693,10 +773,28 @@ earlier. Did you forget?
                 <div className="flex flex-wrap gap-2">
                   <button
                     onClick={() => {
-                      setMode("create");
-                      setCreated(null);
-                      setPassword("");
-                      setMessage("");
+                    setMode("create");
+                    setCreateStep("details");
+                    setCreated(null);
+                    setListName("");
+                    setPassword("");
+                    const now = new Date();
+                    setStartDate(
+                      [
+                        now.getFullYear(),
+                        String(now.getMonth() + 1).padStart(2, "0"),
+                        String(now.getDate()).padStart(2, "0"),
+                      ].join("-"),
+                    );
+                    setStartTime(
+                      [
+                        String(now.getHours()).padStart(2, "0"),
+                        String(now.getMinutes()).padStart(2, "0"),
+                      ].join(":"),
+                    );
+                    setEndDate("");
+                    setEndTime("");
+                    setMessage("");
                     }}
                     className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-black px-3 text-sm font-semibold text-white hover:bg-gray-800"
                   >
