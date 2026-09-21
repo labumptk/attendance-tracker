@@ -44,8 +44,6 @@ export default function Page() {
     [participantListName, setParticipantListName] = useState(""),
     [password, setPassword] = useState(""),
     [masterPassword, setMasterPassword] = useState(""),
-    [startDate, setStartDate] = useState(""),
-    [startTime, setStartTime] = useState(""),
     [endDate, setEndDate] = useState(""),
     [endTime, setEndTime] = useState(""),
     [name, setName] = useState("");
@@ -95,8 +93,6 @@ export default function Page() {
     setParticipantListName("");
     setPassword("");
     setMasterPassword("");
-    setStartDate("");
-    setStartTime("");
     setEndDate("");
     setEndTime("");
     setName("");
@@ -121,27 +117,14 @@ export default function Page() {
       setMessage(result.error ?? "Something went wrong.");
       return;
     }
-    const now = new Date();
-    const today = [
-      now.getFullYear(),
-      String(now.getMonth() + 1).padStart(2, "0"),
-      String(now.getDate()).padStart(2, "0"),
-    ].join("-");
-    const currentTime = [
-      String(now.getHours()).padStart(2, "0"),
-      String(now.getMinutes()).padStart(2, "0"),
-    ].join(":");
-    setStartDate(today);
-    setStartTime(currentTime);
     setCreateStep("details");
   }
   async function handleCreate(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const normalizedName = listName.trim().toUpperCase();
-    const start = new Date(`${startDate}T${startTime}`);
     const end = new Date(`${endDate}T${endTime}`);
-    const parsedDuration = Math.round((end.getTime() - start.getTime()) / 60000);
-    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || parsedDuration < 1 || parsedDuration > 1440) {
+    const parsedDuration = Math.round((end.getTime() - Date.now()) / 60000);
+    if (Number.isNaN(end.getTime()) || parsedDuration < 1 || parsedDuration > 1440) {
       setMessage("Choose a valid date and time window of 1 to 1440 minutes.");
       return;
     }
@@ -734,14 +717,6 @@ earlier. Did you forget?
                     </label>
                     <div className="grid gap-5 sm:grid-cols-2">
                       <label className="block text-sm font-semibold">
-                        Start date
-                        <input className={field} type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required />
-                      </label>
-                      <label className="block text-sm font-semibold">
-                        Start time
-                        <input className={field} type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} required />
-                      </label>
-                      <label className="block text-sm font-semibold">
                         End date
                         <input className={field} type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} required />
                       </label>
@@ -778,20 +753,6 @@ earlier. Did you forget?
                     setCreated(null);
                     setListName("");
                     setPassword("");
-                    const now = new Date();
-                    setStartDate(
-                      [
-                        now.getFullYear(),
-                        String(now.getMonth() + 1).padStart(2, "0"),
-                        String(now.getDate()).padStart(2, "0"),
-                      ].join("-"),
-                    );
-                    setStartTime(
-                      [
-                        String(now.getHours()).padStart(2, "0"),
-                        String(now.getMinutes()).padStart(2, "0"),
-                      ].join(":"),
-                    );
                     setEndDate("");
                     setEndTime("");
                     setMessage("");
