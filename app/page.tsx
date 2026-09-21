@@ -21,7 +21,6 @@ import {
   deleteAttendanceParticipant,
   getAttendanceList,
   getHostLists,
-  verifyHostPassword,
 } from "./actions/attendance";
 import type { AttendanceParticipant } from "@/lib/db/schema";
 
@@ -34,16 +33,14 @@ type HostList = {
   participants: AttendanceParticipant[];
 };
 type Mode = "home" | "create" | "join" | "host-access" | "host";
-type CreateStep = "host" | "details";
+
 
 export default function Page() {
   const [mode, setMode] = useState<Mode>("home");
-  const [createStep, setCreateStep] = useState<CreateStep>("host");
   const [listId, setListId] = useState(""),
     [listName, setListName] = useState(""),
     [participantListName, setParticipantListName] = useState(""),
     [password, setPassword] = useState(""),
-    [masterPassword, setMasterPassword] = useState(""),
     [startDate, setStartDate] = useState(""),
     [startTime, setStartTime] = useState(""),
     [endDate, setEndDate] = useState(""),
@@ -90,11 +87,9 @@ export default function Page() {
   function reset() {
     setMode("home");
     setListId("");
-    setCreateStep("host");
     setListName("");
     setParticipantListName("");
     setPassword("");
-    setMasterPassword("");
     setStartDate("");
     setStartTime("");
     setEndDate("");
@@ -110,30 +105,6 @@ export default function Page() {
     setDirectJoin(false);
     setShareLink("");
     setMessage("");
-  }
-  async function handleHostVerification(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setLoading(true);
-    setMessage("");
-    const result = await verifyHostPassword(masterPassword);
-    setLoading(false);
-    if ("error" in result) {
-      setMessage(result.error ?? "Something went wrong.");
-      return;
-    }
-    const now = new Date();
-    const today = [
-      now.getFullYear(),
-      String(now.getMonth() + 1).padStart(2, "0"),
-      String(now.getDate()).padStart(2, "0"),
-    ].join("-");
-    const currentTime = [
-      String(now.getHours()).padStart(2, "0"),
-      String(now.getMinutes()).padStart(2, "0"),
-    ].join(":");
-    setStartDate(today);
-    setStartTime(currentTime);
-    setCreateStep("details");
   }
   async function handleCreate(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -154,7 +125,6 @@ export default function Page() {
     const result = await createAttendanceList(
       normalizedName,
       password,
-      masterPassword,
       parsedDuration,
     );
     setLoading(false);
@@ -774,7 +744,6 @@ earlier. Did you forget?
                   <button
                     onClick={() => {
                     setMode("create");
-                    setCreateStep("details");
                     setCreated(null);
                     setListName("");
                     setPassword("");
