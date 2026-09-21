@@ -836,7 +836,7 @@ earlier. Did you forget?
                       ))}
                       {selectedList.participants.length === 0 && <p className="px-4 py-6 text-center text-sm text-gray-500">No participants yet.</p>}
                     </div>
-                    <button onClick={() => setSelectedList(null)} className="mt-5 text-sm font-semibold text-gray-500 hover:text-black">← Back to all lists</button>
+                    <button onClick={() => setSelectedList(null)} className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-black"><ArrowLeft data-icon="inline-start" /> Back to host dashboard</button>
                   </div>
                 ) : (
                   <div className="grid gap-4 md:grid-cols-2">
