@@ -6,6 +6,7 @@ export const attendanceLists = pgTable('attendance_lists', {
   creatorPassword: text('creator_password').notNull(),
   listPassword: text('list_password').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  startAt: timestamp('start_at', { withTimezone: true }).defaultNow().notNull(),
   expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
 })
 
