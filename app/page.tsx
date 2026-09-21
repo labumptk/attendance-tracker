@@ -20,6 +20,7 @@ import {
   deleteAttendanceParticipant,
   getAttendanceList,
   getHostLists,
+  verifyHostPassword,
 } from "./actions/attendance";
 import type { AttendanceParticipant } from "@/lib/db/schema";
 
@@ -32,15 +33,20 @@ type HostList = {
   participants: AttendanceParticipant[];
 };
 type Mode = "home" | "create" | "join" | "host-access" | "host";
+type CreateStep = "host" | "details";
 
 export default function Page() {
   const [mode, setMode] = useState<Mode>("home");
+  const [createStep, setCreateStep] = useState<CreateStep>("host");
   const [listId, setListId] = useState(""),
     [listName, setListName] = useState(""),
     [participantListName, setParticipantListName] = useState(""),
     [password, setPassword] = useState(""),
     [masterPassword, setMasterPassword] = useState(""),
-    [durationMinutes, setDurationMinutes] = useState("150"),
+    [startDate, setStartDate] = useState(""),
+    [startTime, setStartTime] = useState(""),
+    [endDate, setEndDate] = useState(""),
+    [endTime, setEndTime] = useState(""),
     [name, setName] = useState("");
   const [created, setCreated] = useState<{ id: string; name: string } | null>(
     null,
@@ -83,11 +89,15 @@ export default function Page() {
   function reset() {
     setMode("home");
     setListId("");
+    setCreateStep("host");
     setListName("");
     setParticipantListName("");
     setPassword("");
     setMasterPassword("");
-    setDurationMinutes("150");
+    setStartDate("");
+    setStartTime("");
+    setEndDate("");
+    setEndTime("");
     setName("");
     setCreated(null);
     setHostLists([]);
@@ -100,12 +110,26 @@ export default function Page() {
     setShareLink("");
     setMessage("");
   }
+  async function handleHostVerification(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setLoading(true);
+    setMessage("");
+    const result = await verifyHostPassword(masterPassword);
+    setLoading(false);
+    if ("error" in result) {
+      setMessage(result.error ?? "Something went wrong.");
+      return;
+    }
+    setCreateStep("details");
+  }
   async function handleCreate(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const normalizedName = listName.trim().toUpperCase();
-    const parsedDuration = Number.parseInt(durationMinutes, 10);
-    if (!Number.isInteger(parsedDuration) || parsedDuration < 1 || parsedDuration > 1440) {
-      setMessage("Active duration must be between 1 and 1440 minutes.");
+    const start = new Date(`${startDate}T${startTime}`);
+    const end = new Date(`${endDate}T${endTime}`);
+    const parsedDuration = Math.round((end.getTime() - start.getTime()) / 60000);
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || parsedDuration < 1 || parsedDuration > 1440) {
+      setMessage("Choose a valid date and time window of 1 to 1440 minutes.");
       return;
     }
     if (!/^\d{4}$/.test(password)) {
@@ -454,10 +478,31 @@ export default function Page() {
                     <ArrowLeft className="rotate-180" size={17} />
                   </button>
                 </div>
+              ) : createStep === "host" ? (
+                <form onSubmit={handleHostVerification} className="space-y-5">
+                  <p className="rounded-xl bg-gray-50 p-4 text-sm leading-6 text-gray-600">
+                    Verify the host password first. Once confirmed, you can set up the list details.
+                  </p>
+                  <label className="block text-sm font-semibold">
+                    Host password
+                    <input
+                      className={field}
+                      type="password"
+                      value={masterPassword}
+                      onChange={(e) => setMasterPassword(e.target.value)}
+                      autoFocus
+                      required
+                    />
+                  </label>
+                  <button className={`${primary} w-full`} disabled={loading}>
+                    {loading ? "Checking…" : "Continue"} <ArrowLeft className="rotate-180" size={17} />
+                  </button>
+                </form>
               ) : (
-                <form onSubmit={handleCreate} className="space-y-5">
+                <form onSubmit={handleCreate} className="flex flex-col gap-5">
                   <label className="block text-sm font-semibold">
                     List name
+
                     <input
                       className={field}
                       value={listName}
@@ -479,28 +524,24 @@ export default function Page() {
                       required
                     />
                   </label>
-                  <label className="block text-sm font-semibold">
-                    Active duration (minutes)
-                    <input
-                      className={field}
-                      type="number"
-                      min={1}
-                      max={1440}
-                      value={durationMinutes}
-                      onChange={(e) => setDurationMinutes(e.target.value)}
-                      required
-                    />
-                  </label>
-                  <label className="block text-sm font-semibold">
-                    Host password
-                    <input
-                      className={field}
-                      type="password"
-                      value={masterPassword}
-                      onChange={(e) => setMasterPassword(e.target.value)}
-                      required
-                    />
-                  </label>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <label className="block text-sm font-semibold">
+                      Starts on
+                      <input className={field} type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required />
+                    </label>
+                    <label className="block text-sm font-semibold">
+                      Start time
+                      <input className={field} type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} required />
+                    </label>
+                    <label className="block text-sm font-semibold">
+                      Ends on
+                      <input className={field} type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} required />
+                    </label>
+                    <label className="block text-sm font-semibold">
+                      End time
+                      <input className={field} type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} required />
+                    </label>
+                  </div>
                   <button className={`${primary} w-full`} disabled={loading}>
                     {loading ? "Creating…" : "Create"} <Plus size={17} />
                   </button>

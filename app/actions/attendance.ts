@@ -20,6 +20,12 @@ function makeListId() {
   return Array.from({ length: 4 }, () => alphabet[Math.floor(Math.random() * alphabet.length)]).join('')
 }
 
+export async function verifyHostPassword(hostPassword: string) {
+  return hostPassword === creatorPassword
+    ? { success: true }
+    : { error: 'The host password is incorrect.' }
+}
+
 export async function createAttendanceList(listName: string, listPassword: string, hostPassword: string, durationMinutes = defaultDurationMinutes) {
   if (hostPassword !== creatorPassword) return { error: 'The host password is incorrect.' }
   const parsedName = listNameSchema.safeParse(listName)
