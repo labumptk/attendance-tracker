@@ -799,7 +799,7 @@ earlier. Did you forget?
   <span>Created: {formatDateTime(selectedList.createdAt)}</span>
   <span>Start: {formatDateTime(selectedList.startAt)}</span>
   <span>End: {formatDateTime(selectedList.expiresAt)}</span>
-  <span title={`${selectedList.participants.length} participants`} aria-label={`${selectedList.participants.length} participants`}><Users /></span>
+  <span className="inline-flex items-center gap-1" title={`${selectedList.participants.length} participants`} aria-label={`${selectedList.participants.length} participants`}><Users size={14} /> {selectedList.participants.length} participants</span>
                         </div>
                       </div>
 <div
