@@ -13,6 +13,8 @@ import {
   Plus,
   Trash2,
   Users,
+  CalendarArrowDown,
+  CalendarArrowUp,
 } from "lucide-react";
 import {
   addParticipant,
@@ -797,8 +799,8 @@ earlier. Did you forget?
                         <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm text-gray-500">
   <span>Code: <strong className="font-mono text-gray-900">{selectedList.id}</strong></span>
   <span>Created: {formatDateTime(selectedList.createdAt)}</span>
-  <span>Start: {formatDateTime(selectedList.startAt)}</span>
-  <span>End: {formatDateTime(selectedList.expiresAt)}</span>
+  <span className="inline-flex items-center gap-1" title={`Start: ${formatDateTime(selectedList.startAt)}`} aria-label={`Start: ${formatDateTime(selectedList.startAt)}`}><CalendarArrowDown size={14} /> {formatDateTime(selectedList.startAt)}</span>
+  <span className="inline-flex items-center gap-1" title={`End: ${formatDateTime(selectedList.expiresAt)}`} aria-label={`End: ${formatDateTime(selectedList.expiresAt)}`}><CalendarArrowUp size={14} /> {formatDateTime(selectedList.expiresAt)}</span>
   <span className="inline-flex items-center gap-1" title={`${selectedList.participants.length} participants`} aria-label={`${selectedList.participants.length} participants`}><Users size={14} /> {selectedList.participants.length}</span>
                         </div>
                       </div>
