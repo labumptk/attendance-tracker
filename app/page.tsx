@@ -4,8 +4,10 @@ import Image from "next/image";
 import { FormEvent, useEffect, useState } from "react";
 import {
   ArrowLeft,
+  CalendarClock,
   Check,
   Clipboard,
+  Clock3,
   ListChecks,
   LockKeyhole,
   LogIn,
@@ -826,8 +828,18 @@ earlier. Did you forget?
                         <h3 className="mt-2 text-2xl font-bold">{selectedList.listName}</h3>
                         <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm text-gray-500">
                           <span>Code: <strong className="font-mono text-gray-900">{selectedList.id}</strong></span>
-                          <span>Created: {formatDateTime(selectedList.createdAt)}</span>
-                          <span>{selectedList.participants.length} participants</span>
+                          <span className="inline-flex items-center gap-1.5">
+                            <CalendarClock aria-hidden="true" className="size-4" />
+                            <span>Start: {formatDateTime(selectedList.createdAt)}</span>
+                          </span>
+                          <span className="inline-flex items-center gap-1.5">
+                            <Clock3 aria-hidden="true" className="size-4" />
+                            <span>End: {formatDateTime(selectedList.expiresAt)}</span>
+                          </span>
+                          <span className="inline-flex items-center gap-1.5">
+                            <Users aria-hidden="true" className="size-4" />
+                            <span>{selectedList.participants.length} participants</span>
+                          </span>
                         </div>
                       </div>
 <div
