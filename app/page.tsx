@@ -111,8 +111,7 @@ export default function Page() {
     const normalizedName = listName.trim().toUpperCase();
     const start = new Date(`${startDate}T${startTime}`);
     const end = new Date(`${endDate}T${endTime}`);
-    const parsedDuration = Math.round((end.getTime() - start.getTime()) / 60000);
-    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || parsedDuration < 1 || parsedDuration > 1440) {
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end.getTime() <= start.getTime() || (end.getTime() - start.getTime()) / 60000 > 1440) {
       setMessage("Choose a valid date and time window of 1 to 1440 minutes.");
       return;
     }
@@ -125,7 +124,8 @@ export default function Page() {
     const result = await createAttendanceList(
       normalizedName,
       password,
-      parsedDuration,
+      start.toISOString(),
+      end.toISOString(),
     );
     setLoading(false);
     if ("error" in result) setMessage(result.error ?? "Something went wrong.");
