@@ -8,6 +8,7 @@ import {
   Clipboard,
   ListChecks,
   LockKeyhole,
+  LogIn,
   LogOut,
   Plus,
   Trash2,
@@ -20,6 +21,7 @@ import {
   deleteAttendanceParticipant,
   getAttendanceList,
   getHostLists,
+  verifyHostPassword,
 } from "./actions/attendance";
 import type { AttendanceParticipant } from "@/lib/db/schema";
 
@@ -32,15 +34,20 @@ type HostList = {
   participants: AttendanceParticipant[];
 };
 type Mode = "home" | "create" | "join" | "host-access" | "host";
+type CreateStep = "host" | "details";
 
 export default function Page() {
   const [mode, setMode] = useState<Mode>("home");
+  const [createStep, setCreateStep] = useState<CreateStep>("host");
   const [listId, setListId] = useState(""),
     [listName, setListName] = useState(""),
     [participantListName, setParticipantListName] = useState(""),
     [password, setPassword] = useState(""),
     [masterPassword, setMasterPassword] = useState(""),
-    [durationMinutes, setDurationMinutes] = useState("150"),
+    [startDate, setStartDate] = useState(""),
+    [startTime, setStartTime] = useState(""),
+    [endDate, setEndDate] = useState(""),
+    [endTime, setEndTime] = useState(""),
     [name, setName] = useState("");
   const [created, setCreated] = useState<{ id: string; name: string } | null>(
     null,
@@ -83,11 +90,15 @@ export default function Page() {
   function reset() {
     setMode("home");
     setListId("");
+    setCreateStep("host");
     setListName("");
     setParticipantListName("");
     setPassword("");
     setMasterPassword("");
-    setDurationMinutes("150");
+    setStartDate("");
+    setStartTime("");
+    setEndDate("");
+    setEndTime("");
     setName("");
     setCreated(null);
     setHostLists([]);
@@ -100,12 +111,26 @@ export default function Page() {
     setShareLink("");
     setMessage("");
   }
+  async function handleHostVerification(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setLoading(true);
+    setMessage("");
+    const result = await verifyHostPassword(masterPassword);
+    setLoading(false);
+    if ("error" in result) {
+      setMessage(result.error ?? "Something went wrong.");
+      return;
+    }
+    setCreateStep("details");
+  }
   async function handleCreate(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const normalizedName = listName.trim().toUpperCase();
-    const parsedDuration = Number.parseInt(durationMinutes, 10);
-    if (!Number.isInteger(parsedDuration) || parsedDuration < 1 || parsedDuration > 1440) {
-      setMessage("Active duration must be between 1 and 1440 minutes.");
+    const start = new Date(`${startDate}T${startTime}`);
+    const end = new Date(`${endDate}T${endTime}`);
+    const parsedDuration = Math.round((end.getTime() - start.getTime()) / 60000);
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || parsedDuration < 1 || parsedDuration > 1440) {
+      setMessage("Choose a valid date and time window of 1 to 1440 minutes.");
       return;
     }
     if (!/^\d{4}$/.test(password)) {
@@ -304,7 +329,18 @@ export default function Page() {
             </span>
             <span className="text-lg font-bold tracking-tight">Hadir</span>
           </button>
-          {mode !== "home" && (
+          {mode === "home" ? (
+            <button
+              onClick={() => {
+                setMode("host-access");
+                setMessage("");
+              }}
+              className="flex items-center gap-2 text-sm font-semibold text-gray-600 transition hover:text-black"
+            >
+              <LogIn size={16} aria-hidden="true" />
+              Log In
+            </button>
+          ) : (
             <button
               onClick={reset}
               className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-black"
@@ -325,41 +361,6 @@ export default function Page() {
                 </p>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
-                <button
-                  onClick={() => setMode("create")}
-                  className="order-2 rounded-2xl border border-gray-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-1 hover:border-gray-400 hover:shadow-xl"
-                >
-                  <span className="mb-4 flex h-9 w-9 items-center justify-center rounded-lg bg-[#f8f9fa] text-gray-700">
-                    <Plus size={18} />
-                  </span>
-                  <span className="block text-base font-bold">Create a list</span>
-                  <span className="mt-1 block text-xs leading-5 text-gray-500">
-                    Start a new list and get a unique ID.
-                  </span>
-                  <span className="mt-4 block text-xs font-semibold text-gray-700">
-                    I am the host →
-                  </span>
-                </button>
-                <button
-                  onClick={() => {
-                    setMode("host-access");
-                    setMessage("");
-                  }}
-                  className="order-3 rounded-2xl border border-gray-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-1 hover:border-gray-400 hover:shadow-xl"
-                >
-                  <span className="mb-4 flex h-9 w-9 items-center justify-center rounded-lg bg-[#f8f9fa] text-gray-700">
-                    <LockKeyhole size={18} />
-                  </span>
-                  <span className="block text-base font-bold">
-                    Manage lists
-                  </span>
-                  <span className="mt-1 block text-xs leading-5 text-gray-500">
-                    Manage all lists with one host password.
-                  </span>
-                  <span className="mt-4 block text-xs font-semibold text-gray-700">
-                    Open host dashboard →
-                  </span>
-                </button>
                 <button
                   onClick={() => {
                     setMode("join");
@@ -383,134 +384,6 @@ export default function Page() {
                   </span>
                 </button>
               </div>
-            </div>
-          )}
-          {mode === "create" && (
-            <div className="w-full max-w-md">
-              <div className="mb-8">
-                <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-gray-700">
-                  New attendance list
-                </p>
-  <div className="flex items-center gap-3">
-  <h2 className="text-4xl font-bold tracking-tight">
-  Create a list
-  </h2>
-  <Image
-  src="/pen.png"
-  alt="Blue pen"
-  width={44}
-  height={44}
-  className="size-11 rounded-lg object-cover"
-  priority
-  />
-  </div>
-              </div>
-              {created ? (
-                <div className="space-y-4">
-                  <div className="rounded-2xl border border-gray-200 bg-white p-5">
-                    <p className="text-sm font-semibold text-gray-700">
-                      {created.name}
-                    </p>
-                    <p className="mt-3 text-sm font-semibold text-gray-700">
-                      List ID
-                    </p>
-                    <div className="mt-2 flex items-center justify-between">
-                      <span className="text-4xl font-bold tracking-[0.3em]">
-                        {created.id}
-                      </span>
-                      <button
-                        onClick={() => copyText(created.id)}
-                        className="rounded-lg p-2 text-gray-800 hover:bg-gray-100"
-                        aria-label="Copy List ID"
-                      >
-                        {copied ? <Check size={20} /> : <Clipboard size={20} />}
-                      </button>
-                    </div>
-                  </div>
-                  <div className="rounded-2xl border border-gray-200 bg-white p-5">
-                    <p className="text-sm font-semibold text-gray-700">
-                      Participant link
-                    </p>
-                    <p className="mt-2 break-all text-xs leading-5 text-gray-500">
-                      Participants can enter their names directly through this link.
-                    </p>
-                    <button
-                      onClick={() => copyText(shareLink)}
-                      className="mt-4 inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-[#f8f9fa] px-4 text-sm font-semibold text-gray-800 hover:border-gray-400"
-                    >
-                      <Clipboard size={16} />{" "}
-                      {copied ? "Link copied" : "Copy participant link"}
-                    </button>
-                  </div>
-                  <button
-                    onClick={() => {
-                      setMode("host-access");
-                      setPassword("");
-                      setMessage("");
-                    }}
-                    className={`${primary} w-full`}
-                  >
-                    Open host dashboard{" "}
-                    <ArrowLeft className="rotate-180" size={17} />
-                  </button>
-                </div>
-              ) : (
-                <form onSubmit={handleCreate} className="space-y-5">
-                  <label className="block text-sm font-semibold">
-                    List name
-                    <input
-                      className={field}
-                      value={listName}
-                      onChange={(e) =>
-                        setListName(e.target.value.toUpperCase().slice(0, 8))
-                      }
-                      maxLength={8}
-                      required
-                    />
-                  </label>
-                  <label className="block text-sm font-semibold">
-                    List password
-                    <input
-                      className={field}
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      minLength={4}
-                      required
-                    />
-                  </label>
-                  <label className="block text-sm font-semibold">
-                    Active duration (minutes)
-                    <input
-                      className={field}
-                      type="number"
-                      min={1}
-                      max={1440}
-                      value={durationMinutes}
-                      onChange={(e) => setDurationMinutes(e.target.value)}
-                      required
-                    />
-                  </label>
-                  <label className="block text-sm font-semibold">
-                    Host password
-                    <input
-                      className={field}
-                      type="password"
-                      value={masterPassword}
-                      onChange={(e) => setMasterPassword(e.target.value)}
-                      required
-                    />
-                  </label>
-                  <button className={`${primary} w-full`} disabled={loading}>
-                    {loading ? "Creating…" : "Create"} <Plus size={17} />
-                  </button>
-                </form>
-              )}
-              {message && (
-                <p className="mt-4 text-sm font-medium text-gray-700">
-                  {message}
-                </p>
-              )}
             </div>
           )}
           {mode === "host-access" && (
