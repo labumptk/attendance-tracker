@@ -121,6 +121,18 @@ export default function Page() {
       setMessage(result.error ?? "Something went wrong.");
       return;
     }
+    const now = new Date();
+    const today = [
+      now.getFullYear(),
+      String(now.getMonth() + 1).padStart(2, "0"),
+      String(now.getDate()).padStart(2, "0"),
+    ].join("-");
+    const currentTime = [
+      String(now.getHours()).padStart(2, "0"),
+      String(now.getMinutes()).padStart(2, "0"),
+    ].join(":");
+    setStartDate(today);
+    setStartTime(currentTime);
     setCreateStep("details");
   }
   async function handleCreate(e: FormEvent<HTMLFormElement>) {
