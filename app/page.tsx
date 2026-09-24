@@ -29,6 +29,7 @@ type HostList = {
   id: string;
   listName: string;
   createdAt: Date;
+  startAt: Date;
   expiresAt: Date;
   participantCount: number;
   participants: AttendanceParticipant[];
@@ -138,8 +139,8 @@ export default function Page() {
   async function handleCreate(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const normalizedName = listName.trim().toUpperCase();
-    const start = new Date(`${startDate}T${startTime}`);
-    const end = new Date(`${endDate}T${endTime}`);
+    const start = new Date(`${startDate}T${startTime}:00+07:00`);
+    const end = new Date(`${endDate}T${endTime}:00+07:00`);
     const parsedDuration = Math.round((end.getTime() - start.getTime()) / 60000);
     if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || parsedDuration < 1 || parsedDuration > 1440) {
       setMessage("Choose a valid date and time window of 1 to 1440 minutes.");
@@ -154,6 +155,7 @@ export default function Page() {
     const result = await createAttendanceList(
       normalizedName,
       password,
+      start,
       parsedDuration,
       masterPassword,
     );
@@ -827,8 +829,8 @@ earlier. Did you forget?
                         <h3 className="mt-2 text-2xl font-bold">{selectedList.listName}</h3>
                         <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm text-gray-500">
                           <span>Code: <strong className="font-mono text-gray-900">{selectedList.id}</strong></span>
-                          <span>Start: {formatDateTime(selectedList.createdAt)}</span>
-                          <span>End: {formatDateTime(selectedList.expiresAt)}</span>
+  <span>Start: {formatDateTime(selectedList.startAt)}</span>
+  <span>End: {formatDateTime(selectedList.expiresAt)}</span>
                           <span className="inline-flex items-center gap-1.5">
                             <Users aria-hidden="true" className="size-4" />
                             <span>{selectedList.participants.length}</span>
