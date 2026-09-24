@@ -11,6 +11,7 @@ import {
   LogIn,
   LogOut,
   Plus,
+  RefreshCw,
   Trash2,
   Users,
 } from "lucide-react";
@@ -218,6 +219,26 @@ export default function Page() {
     }
     setSelectedList({ ...list, participants: result.participants });
     setParticipantSort((current) => ({ ...current, [list.id]: "oldest" }));
+  }
+  async function refreshHostDashboard() {
+    setLoading(true);
+    setMessage("");
+    const result = await getHostLists(masterPassword);
+    if ("error" in result) {
+      setLoading(false);
+      setMessage(result.error ?? "Something went wrong.");
+      return;
+    }
+    setHostLists(result.lists);
+    if (selectedList) {
+      const refreshedList = result.lists.find((list) => list.id === selectedList.id);
+      const details = await getAttendanceList(selectedList.id, masterPassword, "host");
+      if (refreshedList && !("error" in details)) {
+        setSelectedList({ ...refreshedList, participants: details.participants });
+      }
+    }
+    setLoading(false);
+    setMessage("Dashboard data refreshed.");
   }
   async function handleAttendance(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -812,6 +833,14 @@ earlier. Did you forget?
                     className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-black px-3 text-sm font-semibold text-white hover:bg-gray-800"
                   >
                     <Plus size={16} /> Create a new list
+                  </button>
+                  <button
+                    onClick={refreshHostDashboard}
+                    disabled={loading}
+                    className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-700 transition hover:border-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                    aria-label="Refresh dashboard data"
+                  >
+                    <RefreshCw size={16} className={loading ? "animate-spin" : ""} aria-hidden="true" /> Refresh
                   </button>
                   <button
                     onClick={removeSelected}
