@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { FormEvent, useEffect, useState } from "react";
+import { Fragment, FormEvent, useEffect, useState } from "react";
 import {
   ArrowLeft,
   Check,
@@ -329,6 +329,16 @@ export default function Page() {
   const formattedCloseTime = expiresAt
     ? formatDateTime(expiresAt)
     : "The list stays active for the duration you set.";
+  const recentWeekCutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const orderedHostLists = [...hostLists].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
+  const recentHostLists = orderedHostLists.filter(
+    (list) => new Date(list.createdAt).getTime() >= recentWeekCutoff,
+  );
+  const olderHostLists = orderedHostLists.filter(
+    (list) => new Date(list.createdAt).getTime() < recentWeekCutoff,
+  );
 
   return (
     <main className="min-h-screen bg-[#f8f9fa] text-black">
@@ -878,8 +888,22 @@ earlier. Did you forget?
                   </div>
                 ) : (
                   <div className="grid gap-4 md:grid-cols-2">
-                    {hostLists.map((list) => (
-                      <button
+                    {recentHostLists.length > 0 && (
+                      <div className="col-span-full flex items-center gap-3" role="heading" aria-level={3}>
+                        <span className="text-xs font-bold uppercase tracking-[0.18em] text-gray-500">Created this week</span>
+                        <div className="h-px flex-1 bg-gray-200" />
+                      </div>
+                    )}
+                    {[...recentHostLists, ...olderHostLists].map((list, index) => (
+                      <Fragment key={list.id}>
+                        {index === recentHostLists.length && olderHostLists.length > 0 && (
+                          <div className="col-span-full flex items-center gap-3 pt-2" role="separator" aria-label="Older attendance lists">
+                            <div className="h-px flex-1 bg-gray-200" />
+                            <span className="text-xs font-bold uppercase tracking-[0.18em] text-gray-400">Older lists</span>
+                            <div className="h-px flex-1 bg-gray-200" />
+                          </div>
+                        )}
+                        <button
                         type="button"
                         onClick={() => openListDetails(list)}
                         key={list.id}
@@ -909,7 +933,8 @@ earlier. Did you forget?
                             </div>
                           </div>
                         </div>
-                      </button>
+                        </button>
+                      </Fragment>
                     ))}
                   </div>
                 )}
