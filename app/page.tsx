@@ -154,7 +154,6 @@ export default function Page() {
     const result = await createAttendanceList(
       normalizedName,
       password,
-      masterPassword,
       parsedDuration,
     );
     setLoading(false);
