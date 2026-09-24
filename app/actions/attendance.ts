@@ -27,9 +27,10 @@ export async function verifyHostPassword(hostPassword: string) {
   return { success: true }
 }
 
-export async function createAttendanceList(listName: string, listPassword: string, durationMinutes = defaultDurationMinutes) {
+export async function createAttendanceList(listName: string, listPassword: string, durationMinutes = defaultDurationMinutes, hostPassword?: string) {
   const cookieStore = await cookies()
-  if (cookieStore.get('host-access')?.value !== 'granted') return { error: 'Host access is required.' }
+  const hasHostAccess = cookieStore.get('host-access')?.value === 'granted' || hostPassword === creatorPassword
+  if (!hasHostAccess) return { error: 'Host access is required.' }
   const parsedName = listNameSchema.safeParse(listName)
   const parsedPassword = listPasswordSchema.safeParse(listPassword)
   const parsedDuration = durationMinutesSchema.safeParse(durationMinutes)
