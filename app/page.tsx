@@ -154,8 +154,8 @@ export default function Page() {
     const result = await createAttendanceList(
       normalizedName,
       password,
-      masterPassword,
       parsedDuration,
+      masterPassword,
     );
     setLoading(false);
     if ("error" in result) setMessage(result.error ?? "Something went wrong.");
@@ -199,6 +199,7 @@ export default function Page() {
     setLoading(false);
     if ("error" in result) setMessage(result.error ?? "Something went wrong.");
     else {
+      setMasterPassword(password);
       setHostLists(result.lists);
       setListOrder("newest");
       setMode("host");

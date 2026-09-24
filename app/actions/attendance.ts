@@ -21,13 +21,16 @@ function makeListId() {
 }
 
 export async function verifyHostPassword(hostPassword: string) {
-  return hostPassword === creatorPassword
-    ? { success: true }
-    : { error: 'The host password is incorrect.' }
+  if (hostPassword !== creatorPassword) return { error: 'The host password is incorrect.' }
+  const cookieStore = await cookies()
+  cookieStore.set('host-access', 'granted', { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 60 * 60 * 8, path: '/' })
+  return { success: true }
 }
 
-export async function createAttendanceList(listName: string, listPassword: string, hostPassword: string, durationMinutes = defaultDurationMinutes) {
-  if (hostPassword !== creatorPassword) return { error: 'The host password is incorrect.' }
+export async function createAttendanceList(listName: string, listPassword: string, durationMinutes = defaultDurationMinutes, hostPassword?: string) {
+  const cookieStore = await cookies()
+  const hasHostAccess = cookieStore.get('host-access')?.value === 'granted' || hostPassword === creatorPassword
+  if (!hasHostAccess) return { error: 'Host access is required.' }
   const parsedName = listNameSchema.safeParse(listName)
   const parsedPassword = listPasswordSchema.safeParse(listPassword)
   const parsedDuration = durationMinutesSchema.safeParse(durationMinutes)
