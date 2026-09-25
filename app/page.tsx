@@ -38,6 +38,25 @@ type HostList = {
 type Mode = "home" | "create" | "join" | "host-access" | "host";
 type CreateStep = "host" | "details";
 
+const PROJECT_TIME_ZONE = "Asia/Jakarta";
+
+function getProjectDateTimeInputs(date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: PROJECT_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+  return {
+    date: `${values.year}-${values.month}-${values.day}`,
+    time: `${values.hour}:${values.minute}`,
+  };
+}
+
 export default function Page() {
   const [mode, setMode] = useState<Mode>("home");
   const [createStep, setCreateStep] = useState<CreateStep>("host");
@@ -123,18 +142,9 @@ export default function Page() {
       setMessage(result.error ?? "Something went wrong.");
       return;
     }
-    const now = new Date();
-    const today = [
-      now.getFullYear(),
-      String(now.getMonth() + 1).padStart(2, "0"),
-      String(now.getDate()).padStart(2, "0"),
-    ].join("-");
-    const currentTime = [
-      String(now.getHours()).padStart(2, "0"),
-      String(now.getMinutes()).padStart(2, "0"),
-    ].join(":");
-    setStartDate(today);
-    setStartTime(currentTime);
+    const projectDateTime = getProjectDateTimeInputs();
+    setStartDate(projectDateTime.date);
+    setStartTime(projectDateTime.time);
     setCreateStep("details");
   }
   async function handleCreate(e: FormEvent<HTMLFormElement>) {
@@ -339,7 +349,7 @@ export default function Page() {
     message.toLowerCase().includes("already on the attendance list");
   const formatDateTime = (value: Date | string) =>
     new Intl.DateTimeFormat("en-GB", {
-      timeZone: "Asia/Jakarta",
+      timeZone: PROJECT_TIME_ZONE,
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -812,20 +822,9 @@ earlier. Did you forget?
                     setCreated(null);
                     setListName("");
                     setPassword("");
-                    const now = new Date();
-                    setStartDate(
-                      [
-                        now.getFullYear(),
-                        String(now.getMonth() + 1).padStart(2, "0"),
-                        String(now.getDate()).padStart(2, "0"),
-                      ].join("-"),
-                    );
-                    setStartTime(
-                      [
-                        String(now.getHours()).padStart(2, "0"),
-                        String(now.getMinutes()).padStart(2, "0"),
-                      ].join(":"),
-                    );
+                    const projectDateTime = getProjectDateTimeInputs();
+                    setStartDate(projectDateTime.date);
+                    setStartTime(projectDateTime.time);
                     setEndDate("");
                     setEndTime("");
                     setMessage("");
