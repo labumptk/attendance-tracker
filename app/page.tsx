@@ -448,9 +448,9 @@ export default function Page() {
                 <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-gray-700">
                   Host dashboard
                 </p>
-                <h2 className="text-4xl font-bold tracking-tight">
-                  Manage all lists
-                </h2>
+  <h2 className="text-4xl font-bold tracking-tight">
+  Host login screen
+  </h2>
                 <p className="mt-3 text-gray-500">
                   Only a host can manage the lists
                 </p>
