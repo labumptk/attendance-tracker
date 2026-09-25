@@ -410,7 +410,7 @@ export default function Page() {
             <div className="w-full max-w-4xl">
               <div className="mb-12 max-w-2xl">
                 <h1 className="text-5xl font-bold leading-[1.05] tracking-tight sm:text-7xl">
-                  Hadir
+                  Home screen
                 </h1>
                 <p className="mt-3 text-sm text-gray-500">
                   oleh Rachmat Wahid Saleh Insani
