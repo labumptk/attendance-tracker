@@ -814,7 +814,16 @@ earlier. Did you forget?
                     All your lists
                   </h2>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap items-center justify-end gap-2">
+                  {selectedList && (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedList(null)}
+                      className="mr-2 text-sm font-semibold text-gray-500 hover:text-black"
+                    >
+                      ← Back to all lists
+                    </button>
+                  )}
                   <button
                     onClick={() => {
                     setMode("create");
@@ -912,7 +921,6 @@ earlier. Did you forget?
                       ))}
                       {selectedList.participants.length === 0 && <p className="px-4 py-6 text-center text-sm text-gray-500">No participants yet.</p>}
                     </div>
-                    <button onClick={() => setSelectedList(null)} className="mt-5 text-sm font-semibold text-gray-500 hover:text-black">← Back to all lists</button>
                   </div>
                 ) : (
                   <div className="grid gap-4 md:grid-cols-2">
