@@ -445,12 +445,10 @@ export default function Page() {
           {mode === "host-access" && (
             <div className="w-full max-w-md">
               <div className="mb-8">
-                <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-gray-700">
-                  Host dashboard
-                </p>
-  <h2 className="text-4xl font-bold tracking-tight">
-  Host login screen
-  </h2>
+          <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-gray-700">
+            Host login
+          </p>
+
                 <p className="mt-3 text-gray-500">
                   Only a host can manage the lists
                 </p>
@@ -466,9 +464,9 @@ export default function Page() {
                     required
                   />
                 </label>
-                <button className={`${primary} w-full`} disabled={loading}>
-                  {loading ? "Checking…" : "Open dashboard"} <Users size={17} />
-                </button>
+          <button className={`${primary} w-full`} disabled={loading}>
+            {loading ? "Checking…" : "Login"} <LogIn size={17} />
+          </button>
               </form>
               {message && (
                 <p className="mt-4 text-sm font-medium text-red-600">
