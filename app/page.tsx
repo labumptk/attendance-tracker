@@ -448,9 +448,9 @@ export default function Page() {
   <img
   src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/open-door-MAKjHH0BX6IkzYfr55tCKPf2BOKjJ7.png"
   alt="An open wooden door"
-  className="mb-5 size-32 object-contain"
+  className="mx-auto mb-5 size-32 object-contain"
   />
-  <h1 className="text-4xl font-bold tracking-tight text-gray-900">
+  <h1 className="self-center text-center text-4xl font-bold tracking-tight text-gray-900">
   Welcome
   </h1>
   <p className="mt-3 text-sm font-bold uppercase tracking-[0.18em] text-gray-700">
