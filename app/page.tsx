@@ -443,20 +443,27 @@ export default function Page() {
             </div>
           )}
           {mode === "host-access" && (
-            <div className="w-full max-w-md">
-              <div className="mb-8">
-          <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-gray-700">
-            Host login
-          </p>
-
-                <p className="mt-3 text-gray-500">
-                  Only a host can manage the lists
-                </p>
-              </div>
-              <form onSubmit={handleHost} className="space-y-5">
-                <label className="block text-sm font-semibold">
-                  Host password
-                  <input
+  <div className="w-full max-w-md">
+  <div className="mb-8 flex flex-col items-center text-center">
+  <img
+  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/open-door-MAKjHH0BX6IkzYfr55tCKPf2BOKjJ7.png"
+  alt="An open wooden door"
+  className="mb-5 size-32 object-contain"
+  />
+  <h1 className="text-4xl font-bold tracking-tight text-gray-900">
+  Welcome
+  </h1>
+  <p className="mt-3 text-sm font-bold uppercase tracking-[0.18em] text-gray-700">
+  Host login
+  </p>
+  <p className="mt-3 text-gray-500">
+  Only a host can manage the lists
+  </p>
+  </div>
+  <form onSubmit={handleHost} className="space-y-5">
+  <label className="block text-sm font-semibold">
+  Password
+  <input
                     className={field}
                     type="password"
                     value={password}
