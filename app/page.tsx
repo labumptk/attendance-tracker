@@ -444,7 +444,7 @@ export default function Page() {
           )}
           {mode === "host-access" && (
   <div className="w-full max-w-md">
-  <div className="mb-8 flex flex-col items-center text-center">
+  <div className="mb-8 flex flex-col items-start text-left">
   <img
   src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/open-door-MAKjHH0BX6IkzYfr55tCKPf2BOKjJ7.png"
   alt="An open wooden door"
