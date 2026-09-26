@@ -410,7 +410,7 @@ export default function Page() {
             <div className="w-full max-w-4xl">
               <div className="mb-12 max-w-2xl">
                 <h1 className="text-5xl font-bold leading-[1.05] tracking-tight sm:text-7xl">
-                  Hadir
+                  Home screen
                 </h1>
                 <p className="mt-3 text-sm text-gray-500">
                   oleh Rachmat Wahid Saleh Insani
@@ -443,22 +443,27 @@ export default function Page() {
             </div>
           )}
           {mode === "host-access" && (
-            <div className="w-full max-w-md">
-              <div className="mb-8">
-                <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-gray-700">
-                  Host dashboard
-                </p>
-                <h2 className="text-4xl font-bold tracking-tight">
-                  Manage all lists
-                </h2>
-                <p className="mt-3 text-gray-500">
-                  Only a host can manage the lists
-                </p>
-              </div>
-              <form onSubmit={handleHost} className="space-y-5">
-                <label className="block text-sm font-semibold">
-                  Host password
-                  <input
+  <div className="w-full max-w-md">
+  <div className="mb-8 flex flex-col items-start text-left">
+  <img
+  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/open-door-MAKjHH0BX6IkzYfr55tCKPf2BOKjJ7.png"
+  alt="An open wooden door"
+  className="mx-auto mb-5 size-32 object-contain"
+  />
+  <h1 className="self-center text-center text-4xl font-bold tracking-tight text-gray-900">
+  Welcome
+  </h1>
+  <p className="mt-3 text-sm font-bold uppercase tracking-[0.18em] text-gray-700">
+  Host login
+  </p>
+  <p className="mt-3 text-gray-500">
+  Only a host can manage the lists
+  </p>
+  </div>
+  <form onSubmit={handleHost} className="space-y-5">
+  <label className="block text-sm font-semibold">
+  Password
+  <input
                     className={field}
                     type="password"
                     value={password}
@@ -466,9 +471,9 @@ export default function Page() {
                     required
                   />
                 </label>
-                <button className={`${primary} w-full`} disabled={loading}>
-                  {loading ? "Checking…" : "Open dashboard"} <Users size={17} />
-                </button>
+          <button className={`${primary} w-full`} disabled={loading}>
+            {loading ? "Checking…" : "Login"} <LogIn size={17} />
+          </button>
               </form>
               {message && (
                 <p className="mt-4 text-sm font-medium text-red-600">
