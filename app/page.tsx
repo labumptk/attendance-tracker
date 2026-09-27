@@ -444,7 +444,7 @@ export default function Page() {
           )}
           {mode === "host-access" && (
   <div className="w-full max-w-md">
-  <div className="mb-8 flex flex-col items-start text-left">
+  <div className="mb-8 flex flex-col items-center text-center">
   <img
   src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/open-door-MAKjHH0BX6IkzYfr55tCKPf2BOKjJ7.png"
   alt="An open wooden door"
@@ -461,16 +461,15 @@ export default function Page() {
   </p>
   </div>
   <form onSubmit={handleHost} className="space-y-5">
-  <label className="block text-sm font-semibold">
-  Password
   <input
-                    className={field}
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </label>
+  className={field}
+  type="password"
+  placeholder="PASSWORD"
+  aria-label="Password"
+  value={password}
+  onChange={(e) => setPassword(e.target.value)}
+  required
+  />
           <button className={`${primary} w-full`} disabled={loading}>
             {loading ? "Checking…" : "Login"} <LogIn size={17} />
           </button>
