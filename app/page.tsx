@@ -231,7 +231,7 @@ export default function Page() {
       return;
     }
     setSelectedList({ ...list, participants: result.participants });
-    setParticipantSort((current) => ({ ...current, [list.id]: "oldest" }));
+    setParticipantSort((current) => ({ ...current, [list.id]: "az" }));
   }
   async function refreshHostDashboard() {
     setLoading(true);
@@ -863,13 +863,15 @@ earlier. Did you forget?
                   >
                     <RefreshCw size={16} className={loading ? "animate-spin" : ""} aria-hidden="true" /> Refresh
                   </button>
-                  <button
-                    onClick={removeSelected}
-                    disabled={!selected.length || loading}
-                    className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-700 disabled:opacity-40"
-                  >
-                    <Trash2 size={16} /> Delete selected
-                  </button>
+                  {!selectedList && (
+                    <button
+                      onClick={removeSelected}
+                      disabled={!selected.length || loading}
+                      className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-700 disabled:opacity-40"
+                    >
+                      <Trash2 size={16} /> Delete selected
+                    </button>
+                  )}
                 </div>
               </div>
               {message && (
@@ -910,7 +912,7 @@ earlier. Did you forget?
                       <label className="inline-flex h-9 items-center gap-2 rounded-lg border border-gray-200 px-3 text-sm font-medium">
                         <select
                           aria-label="Sort participants"
-                          value={participantSort[selectedList.id] ?? "oldest"}
+                          value={participantSort[selectedList.id] ?? "az"}
                           onChange={(e) => setParticipantSort((current) => ({ ...current, [selectedList.id]: e.target.value as "az" | "za" | "newest" | "oldest" }))}
                           className="bg-transparent outline-none"
                         >
@@ -923,7 +925,7 @@ earlier. Did you forget?
                     </div>
                     <div className="divide-y divide-gray-100 rounded-xl border border-gray-100">
                       {[...selectedList.participants].sort((a, b) => {
-                        const order = participantSort[selectedList.id] ?? "oldest";
+                        const order = participantSort[selectedList.id] ?? "az";
                         if (order === "az" || order === "za") return order === "az" ? a.fullName.localeCompare(b.fullName) : b.fullName.localeCompare(a.fullName);
                         return order === "newest" ? new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime() : new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
                       }).map((participant) => (
