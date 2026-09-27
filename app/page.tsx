@@ -6,6 +6,8 @@ import {
   ArrowLeft,
   Check,
   Clipboard,
+  Eye,
+  EyeOff,
   ListChecks,
   LockKeyhole,
   LogIn,
@@ -88,6 +90,7 @@ export default function Page() {
     [expiresAt, setExpiresAt] = useState("");
   const [message, setMessage] = useState(""),
     [loading, setLoading] = useState(false),
+    [showHostPassword, setShowHostPassword] = useState(false),
     [copied, setCopied] = useState(false),
     [unknownList, setUnknownList] = useState(false),
     [wrongPassword, setWrongPassword] = useState(false);
@@ -444,7 +447,7 @@ export default function Page() {
           )}
           {mode === "host-access" && (
   <div className="w-full max-w-md">
-  <div className="mb-8 flex flex-col items-start text-left">
+  <div className="mb-8 flex flex-col items-center text-center">
   <img
   src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/open-door-MAKjHH0BX6IkzYfr55tCKPf2BOKjJ7.png"
   alt="An open wooden door"
@@ -461,16 +464,30 @@ export default function Page() {
   </p>
   </div>
   <form onSubmit={handleHost} className="space-y-5">
-  <label className="block text-sm font-semibold">
-  Password
+  <div className="relative">
   <input
-                    className={field}
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </label>
+  className={`${field} pr-12`}
+  type={showHostPassword ? "text" : "password"}
+  placeholder="PASSWORD"
+  aria-label="Password"
+  value={password}
+  onChange={(e) => setPassword(e.target.value)}
+  required
+  />
+  <button
+  type="button"
+  className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-gray-500 transition-colors hover:text-gray-900"
+  aria-label={showHostPassword ? "Hide password" : "Show password"}
+  onPointerDown={(e) => {
+    if (e.button === 0) setShowHostPassword(true);
+  }}
+  onPointerUp={() => setShowHostPassword(false)}
+  onPointerLeave={() => setShowHostPassword(false)}
+  onPointerCancel={() => setShowHostPassword(false)}
+  >
+  {showHostPassword ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
+  </button>
+  </div>
           <button className={`${primary} w-full`} disabled={loading}>
             {loading ? "Checking…" : "Login"} <LogIn size={17} />
           </button>
