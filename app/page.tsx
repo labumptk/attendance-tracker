@@ -863,13 +863,15 @@ earlier. Did you forget?
                   >
                     <RefreshCw size={16} className={loading ? "animate-spin" : ""} aria-hidden="true" /> Refresh
                   </button>
-                  <button
-                    onClick={removeSelected}
-                    disabled={!selected.length || loading}
-                    className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-700 disabled:opacity-40"
-                  >
-                    <Trash2 size={16} /> Delete selected
-                  </button>
+                  {!selectedList && (
+                    <button
+                      onClick={removeSelected}
+                      disabled={!selected.length || loading}
+                      className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-700 disabled:opacity-40"
+                    >
+                      <Trash2 size={16} /> Delete selected
+                    </button>
+                  )}
                 </div>
               </div>
               {message && (
