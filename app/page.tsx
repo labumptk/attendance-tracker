@@ -14,6 +14,7 @@ import {
   LogOut,
   Plus,
   RefreshCw,
+  Share2,
   Trash2,
   Users,
 } from "lucide-react";
@@ -269,9 +270,19 @@ export default function Page() {
     }
   }
   async function copyText(text: string) {
-    await navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+  await navigator.clipboard.writeText(text);
+  setCopied(true);
+  setTimeout(() => setCopied(false), 1500);
+  }
+  async function shareList(list: HostList) {
+  const link = `${window.location.origin}?list=${list.id}&name=${encodeURIComponent(list.listName)}&password=${encodeURIComponent(masterPassword)}&expiresAt=${encodeURIComponent(new Date(list.expiresAt).toISOString())}`;
+  setShareLink(link);
+  if (navigator.share) {
+  await navigator.share({ title: `Join ${list.listName}`, text: "Enter your name to record attendance.", url: link });
+  } else {
+  await copyText(link);
+  setMessage("Participant link copied to your clipboard.");
+  }
   }
   async function removeSelected() {
     if (!confirm("Delete the selected lists and all their participants?"))
@@ -413,7 +424,7 @@ export default function Page() {
             <div className="w-full max-w-4xl">
               <div className="mb-12 max-w-2xl">
                 <h1 className="text-5xl font-bold leading-[1.05] tracking-tight sm:text-7xl">
-                  Home screen
+                  Hadir
                 </h1>
                 <p className="mt-3 text-sm text-gray-500">
                   oleh Rachmat Wahid Saleh Insani
@@ -888,7 +899,9 @@ earlier. Did you forget?
                     <div className="mb-5 flex items-start justify-between gap-4">
                       <div>
                         <p className="text-xs font-bold uppercase tracking-[0.18em] text-gray-500">List details</p>
-                        <h3 className="mt-2 text-2xl font-bold">{selectedList.listName}</h3>
+                        <div className="mt-2 flex items-center gap-3">
+                          <h3 className="text-2xl font-bold">{selectedList.listName}</h3>
+                        </div>
                         <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm text-gray-500">
                           <span>Code: <strong className="font-mono text-gray-900">{selectedList.id}</strong></span>
   <span>Created: {formatDateTime(selectedList.createdAt)}</span>
@@ -900,12 +913,22 @@ earlier. Did you forget?
                           </span>
                         </div>
                       </div>
-<div
-                          className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold ${Date.now() >= new Date(selectedList.expiresAt).getTime() ? "border-gray-200 bg-gray-100 text-gray-700" : selectedList.participants.length === 0 ? "border-blue-200 bg-blue-50 text-blue-800" : "border-green-200 bg-green-50 text-green-800"}`}
+                      <div className="flex shrink-0 items-center gap-2">
+                        <div
+                          className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold ${Date.now() >= new Date(selectedList.expiresAt).getTime() ? "border-gray-200 bg-gray-100 text-gray-700" : selectedList.participants.length === 0 ? "border-blue-200 bg-blue-50 text-blue-800" : "border-green-200 bg-green-50 text-green-800"}`}
                           role="status"
                         >
                           {Date.now() >= new Date(selectedList.expiresAt).getTime() ? "INACTIVE" : selectedList.participants.length === 0 ? "SCHEDULED" : "ACTIVE"}
                         </div>
+                        <button
+                          type="button"
+                          onClick={() => shareList(selectedList)}
+                          className="inline-flex size-4 items-center justify-center border-0 bg-transparent p-0 text-gray-700 transition hover:text-gray-900"
+                          aria-label={`Share ${selectedList.listName} attendance list`}
+                        >
+                          <Share2 aria-hidden="true" className="size-4" />
+                        </button>
+                      </div>
                     </div>
                     <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                       <h4 className="font-semibold">Participants</h4>
