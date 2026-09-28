@@ -14,6 +14,7 @@ import {
   LogOut,
   Plus,
   RefreshCw,
+  Share2,
   Trash2,
   Users,
 } from "lucide-react";
@@ -269,9 +270,19 @@ export default function Page() {
     }
   }
   async function copyText(text: string) {
-    await navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+  await navigator.clipboard.writeText(text);
+  setCopied(true);
+  setTimeout(() => setCopied(false), 1500);
+  }
+  async function shareList(list: HostList) {
+  const link = `${window.location.origin}?list=${list.id}&name=${encodeURIComponent(list.listName)}&password=${encodeURIComponent(masterPassword)}&expiresAt=${encodeURIComponent(new Date(list.expiresAt).toISOString())}`;
+  setShareLink(link);
+  if (navigator.share) {
+  await navigator.share({ title: `Join ${list.listName}`, text: "Enter your name to record attendance.", url: link });
+  } else {
+  await copyText(link);
+  setMessage("Participant link copied to your clipboard.");
+  }
   }
   async function removeSelected() {
     if (!confirm("Delete the selected lists and all their participants?"))
@@ -888,7 +899,17 @@ earlier. Did you forget?
                     <div className="mb-5 flex items-start justify-between gap-4">
                       <div>
                         <p className="text-xs font-bold uppercase tracking-[0.18em] text-gray-500">List details</p>
-                        <h3 className="mt-2 text-2xl font-bold">{selectedList.listName}</h3>
+                        <div className="mt-2 flex items-center gap-3">
+                          <h3 className="text-2xl font-bold">{selectedList.listName}</h3>
+                          <button
+                            type="button"
+                            onClick={() => shareList(selectedList)}
+                            className="inline-flex h-9 items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-700 transition hover:border-gray-400 hover:bg-gray-50"
+                            aria-label={`Share ${selectedList.listName} attendance list`}
+                          >
+                            <Share2 size={16} aria-hidden="true" /> Share
+                          </button>
+                        </div>
                         <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm text-gray-500">
                           <span>Code: <strong className="font-mono text-gray-900">{selectedList.id}</strong></span>
   <span>Created: {formatDateTime(selectedList.createdAt)}</span>
