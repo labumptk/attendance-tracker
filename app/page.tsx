@@ -901,14 +901,6 @@ earlier. Did you forget?
                         <p className="text-xs font-bold uppercase tracking-[0.18em] text-gray-500">List details</p>
                         <div className="mt-2 flex items-center gap-3">
                           <h3 className="text-2xl font-bold">{selectedList.listName}</h3>
-                          <button
-                            type="button"
-                            onClick={() => shareList(selectedList)}
-                            className="inline-flex h-9 items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-700 transition hover:border-gray-400 hover:bg-gray-50"
-                            aria-label={`Share ${selectedList.listName} attendance list`}
-                          >
-                            <Share2 size={16} aria-hidden="true" /> Share
-                          </button>
                         </div>
                         <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm text-gray-500">
                           <span>Code: <strong className="font-mono text-gray-900">{selectedList.id}</strong></span>
@@ -918,6 +910,14 @@ earlier. Did you forget?
                           <span className="inline-flex items-center gap-1.5">
                             <Users aria-hidden="true" className="size-4" />
                             <span>{selectedList.participants.length}</span>
+                            <button
+                              type="button"
+                              onClick={() => shareList(selectedList)}
+                              className="inline-flex size-7 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-700 transition hover:border-gray-400 hover:bg-gray-50"
+                              aria-label={`Share ${selectedList.listName} attendance list`}
+                            >
+                              <Share2 aria-hidden="true" className="size-4" />
+                            </button>
                           </span>
                         </div>
                       </div>
