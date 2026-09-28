@@ -517,7 +517,7 @@ export default function Page() {
               {unknownList ? (
                 <div className="flex flex-col items-center text-center">
                   <Image
-                    src="/empty.png"
+                    src="/empty-result.png"
                     alt="Question mark and magnifying glass illustration"
                     width={220}
                     height={220}
