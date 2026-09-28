@@ -920,14 +920,16 @@ earlier. Did you forget?
                         >
                           {Date.now() >= new Date(selectedList.expiresAt).getTime() ? "INACTIVE" : selectedList.participants.length === 0 ? "SCHEDULED" : "ACTIVE"}
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => shareList(selectedList)}
-                          className="inline-flex size-4 items-center justify-center border-0 bg-transparent p-0 text-gray-700 transition hover:text-gray-900"
-                          aria-label={`Share ${selectedList.listName} attendance list`}
-                        >
-                          <Share2 aria-hidden="true" className="size-4" />
-                        </button>
+  {Date.now() < new Date(selectedList.expiresAt).getTime() && (
+  <button
+  type="button"
+  onClick={() => shareList(selectedList)}
+  className="inline-flex size-4 items-center justify-center border-0 bg-transparent p-0 text-gray-700 transition hover:text-gray-900"
+  aria-label={`Share ${selectedList.listName} attendance list`}
+  >
+  <Share2 aria-hidden="true" className="size-4" />
+  </button>
+  )}
                       </div>
                     </div>
                     <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
