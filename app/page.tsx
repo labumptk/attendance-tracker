@@ -910,23 +910,25 @@ earlier. Did you forget?
                           <span className="inline-flex items-center gap-1.5">
                             <Users aria-hidden="true" className="size-4" />
                             <span>{selectedList.participants.length}</span>
-                            <button
-                              type="button"
-                              onClick={() => shareList(selectedList)}
-                              className="inline-flex size-7 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-700 transition hover:border-gray-400 hover:bg-gray-50"
-                              aria-label={`Share ${selectedList.listName} attendance list`}
-                            >
-                              <Share2 aria-hidden="true" className="size-4" />
-                            </button>
                           </span>
                         </div>
                       </div>
-<div
-                          className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold ${Date.now() >= new Date(selectedList.expiresAt).getTime() ? "border-gray-200 bg-gray-100 text-gray-700" : selectedList.participants.length === 0 ? "border-blue-200 bg-blue-50 text-blue-800" : "border-green-200 bg-green-50 text-green-800"}`}
+                      <div className="flex shrink-0 items-center gap-2">
+                        <div
+                          className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold ${Date.now() >= new Date(selectedList.expiresAt).getTime() ? "border-gray-200 bg-gray-100 text-gray-700" : selectedList.participants.length === 0 ? "border-blue-200 bg-blue-50 text-blue-800" : "border-green-200 bg-green-50 text-green-800"}`}
                           role="status"
                         >
                           {Date.now() >= new Date(selectedList.expiresAt).getTime() ? "INACTIVE" : selectedList.participants.length === 0 ? "SCHEDULED" : "ACTIVE"}
                         </div>
+                        <button
+                          type="button"
+                          onClick={() => shareList(selectedList)}
+                          className="inline-flex size-4 items-center justify-center border-0 bg-transparent p-0 text-gray-700 transition hover:text-gray-900"
+                          aria-label={`Share ${selectedList.listName} attendance list`}
+                        >
+                          <Share2 aria-hidden="true" className="size-4" />
+                        </button>
+                      </div>
                     </div>
                     <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                       <h4 className="font-semibold">Participants</h4>
